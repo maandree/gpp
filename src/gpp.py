@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import sys
+from subprocess import Popen, PIPE
 
 symbol = '@'
 encoding = 'utf-8'
@@ -17,13 +18,54 @@ bashed = []
 def pp(line):
     rc = ''
     symb = False
+    brackets = 0
+    esc = False
+    dollar = False
+    quote = []
     for c in line:
-        if symb:
+        if len(quote) > 0:
+            if esc:
+                esc = False
+            elif dollar:
+                dollar = False
+                if c == '(':
+                    quote.append(')')
+                elif c == '{':
+                    quote.append('}')
+            elif c == quote[-1]:
+                quote[:] = quote[:-1]
+            elif (quote[-1] in ')}') and (c in '\'"`'):
+                quote.append(c)
+            elif (c == '\\') and (quote[-1] != "'"):
+                esc = True
+            elif c == '$':
+                dollar = True
+            rc += c
+        elif brackets > 0:
+            if esc:
+                esc = False
+            elif (c == ')') or (c == '}'):
+                brackets -= 1
+                if brackets == 0:
+                    rc += c + '"\''
+                    continue
+            elif (c == '(') or (c == '{'):
+                brackets += 1
+            elif c == '\\':
+                esc = True
+            rc += c
+        elif symb:
             symb = False
             if c == symbol:
                 rc += c
         elif c == symbol:
             symb = True
+        elif (c == '(') or (c == '{'):
+            brackets += 1
+            rc += '\'"$' + c
+        elif (c == '"') or (c == "'") or (c == '`'):
+            quote.append(c)
+            rc += c
         else:
             rc += c
     return rc
@@ -40,5 +82,32 @@ for lineno in range(len(data)):
         bashed.append(line)
     else:
         line = '\'%s\'' % line.replace('\'', '\'\\\'\'')
-        bashed.append('echo %i %s' % (lineno, pp(line)))
+        bashed.append('echo $\'\\e%i\\e\' %s' % (lineno, pp(line)))
+
+bashed = '\n'.join(bashed).encode(encoding)
+bash = Popen(["bash"], stdin = PIPE, stdout = PIPE, stderr = sys.stderr)
+bashed = bash.communicate(bashed)[0]
+
+if bash.returncode != 0:
+    sys.exit(bash.returncode)
+
+bashed = bashed.decode(encoding, 'error').split('\n')
+pped = []
+lineno = -1
+
+for line in bashed:
+    no = -1
+    if line.startswith('\033'):
+        no = int(line[:1].split('\033')[0])
+        line = '\033'.join(line[:1].split('\033')[1:])
+    if no > lineno:
+        while no != lineno + 1:
+            pped.append('')
+            lineno += 1
+    pped.append(line)
+    lineno += 1
+
+with open(output_file, 'wb') as file:
+    file.write('\n'.join(pped).encode(encoding))
+    file.flush()
 
