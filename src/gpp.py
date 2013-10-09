@@ -23,7 +23,29 @@ def pp(line):
     dollar = False
     quote = []
     for c in line:
-        if len(quote) > 0:
+        if brackets > 0:
+            if esc:
+                esc = False
+            elif (c == ')') or (c == '}'):
+                brackets -= 1
+                if brackets == 0:
+                    rc += c + '"\''
+                    continue
+            elif (c == '(') or (c == '{'):
+                brackets += 1
+            elif c == '\\':
+                esc = True
+            rc += c
+        elif symb:
+            symb = False
+            if (c == '(') or (c == '{'):
+                brackets += 1
+                rc += '\'"$' + c
+            else:
+                rc += c
+        elif c == symbol:
+            symb = True
+        elif len(quote) > 0:
             if esc:
                 esc = False
             elif dollar:
@@ -41,28 +63,6 @@ def pp(line):
             elif c == '$':
                 dollar = True
             rc += c
-        elif brackets > 0:
-            if esc:
-                esc = False
-            elif (c == ')') or (c == '}'):
-                brackets -= 1
-                if brackets == 0:
-                    rc += c + '"\''
-                    continue
-            elif (c == '(') or (c == '{'):
-                brackets += 1
-            elif c == '\\':
-                esc = True
-            rc += c
-        elif symb:
-            symb = False
-            if c == symbol:
-                rc += c
-        elif c == symbol:
-            symb = True
-        elif (c == '(') or (c == '{'):
-            brackets += 1
-            rc += '\'"$' + c
         elif (c == '"') or (c == "'") or (c == '`'):
             quote.append(c)
             rc += c
@@ -82,7 +82,7 @@ for lineno in range(len(data)):
         bashed.append(line)
     else:
         line = '\'%s\'' % line.replace('\'', '\'\\\'\'')
-        bashed.append('echo $\'\\e%i\\e\' %s' % (lineno, pp(line)))
+        bashed.append('echo $\'\\e%i\\e\'%s' % (lineno, pp(line)))
 
 bashed = '\n'.join(bashed).encode(encoding)
 bash = Popen(["bash"], stdin = PIPE, stdout = PIPE, stderr = sys.stderr)
