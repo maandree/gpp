@@ -98,8 +98,8 @@ lineno = -1
 for line in bashed:
     no = -1
     if line.startswith('\033'):
-        no = int(line[:1].split('\033')[0])
-        line = '\033'.join(line[:1].split('\033')[1:])
+        no = int(line[1:].split('\033')[0])
+        line = '\033'.join(line[1:].split('\033')[1:])
     if no > lineno:
         while no != lineno + 1:
             pped.append('')
