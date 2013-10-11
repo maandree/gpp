@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
+import os
 import sys
+import shlex
 from subprocess import Popen, PIPE
 
 symbol = '@'
@@ -8,13 +10,24 @@ encoding = 'utf-8'
 iterations = 1
 input_file = '/dev/stdin'
 output_file = '/dev/stdout'
+unshebang = False
 
-for i in range(1, len(sys.argv)):
-    arg = sys.argv[i]
+args = sys.argv
+
+# If the file is executed, the first command line argument will be the first argument in the shebang,
+# the second will be the rest of the arguments in the command line as is and the third and final will
+# be the executed file.
+if len(args) == 3:
+    if os.path.exists(args[2]) and os.path.isfile(args[2]) and ((os.stat(args[2]).st_mode & 0o111) != 0):
+        args[1 : 2] = shlex.split(args[1])
+
+for i in range(1, len(args)):
+    arg = args[i]
     i += 1
     if   arg in ('-s', '--symbol'):      symbol      = sys.argv[i]
     elif arg in ('-e', '--encoding'):    encoding    = sys.argv[i]
     elif arg in ('-n', '--iterations'):  iterations  = int(sys.argv[i])
+    elif arg in ('-u', '--unshebang'):   unshebang   = True; continue
     elif arg in ('-i', '--input'):       input_file  = sys.argv[i]
     elif arg in ('-o', '--output'):      output_file = sys.argv[i]
     elif arg in ('-f', '--file'):
@@ -40,6 +53,10 @@ if iterations < 1:
 data = None
 with open(input_file, 'rb') as file:
     data = file.read().decode(encoding, 'error').split('\n')
+
+if unshebang:
+    if data[0][:2] == '#!':
+        data[:] = data[1:]
 
 def pp(line):
     rc = ''
