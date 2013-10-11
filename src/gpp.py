@@ -12,11 +12,11 @@ output_file = '/dev/stdout'
 for i in range(1, len(sys.argv)):
     arg = sys.argv[i]
     i += 1
-    if   arg in ('-s', '--symbol'):     symbol      = sys.argv[i]
-    elif arg in ('-e', '--encoding'):   encoding    = sys.argv[i]
-    else arg in ('-n', '--iterations')  iterations  = int(sys.argv[i])
-    elif arg in ('-i', '--input'):      input_file  = sys.argv[i]
-    elif arg in ('-o', '--output'):     output_file = sys.argv[i]
+    if   arg in ('-s', '--symbol'):      symbol      = sys.argv[i]
+    elif arg in ('-e', '--encoding'):    encoding    = sys.argv[i]
+    elif arg in ('-n', '--iterations'):  iterations  = int(sys.argv[i])
+    elif arg in ('-i', '--input'):       input_file  = sys.argv[i]
+    elif arg in ('-o', '--output'):      output_file = sys.argv[i]
     elif arg in ('-f', '--file'):
         input_file  = sys.argv[i]
         output_file = sys.argv[i]
@@ -34,14 +34,12 @@ if iterations < 1:
             data = file.read()
         with open(write_file, 'wb') as file:
             file.write(data)
+            file.flush()
     sys.exit(0)
 
 data = None
 with open(input_file, 'rb') as file:
     data = file.read().decode(encoding, 'error').split('\n')
-
-entered = False
-bashed = []
 
 def pp(line):
     rc = ''
@@ -98,44 +96,48 @@ def pp(line):
             rc += c
     return rc
 
-for lineno in range(len(data)):
-    line = data[lineno]
-    if line.startswith(symbol + '<'):
-        bashed.append(line[2:])
-        entered = True
-    elif line.startswith(symbol + '>'):
-        bashed.append(line[2:])
-        entered = False
-    elif entered:
-        bashed.append(line)
-    else:
-        line = '\'%s\'' % line.replace('\'', '\'\\\'\'')
-        bashed.append('echo $\'\\e%i\\e\'%s' % (lineno, pp(line)))
-
-bashed = '\n'.join(bashed).encode(encoding)
-bash = Popen(["bash"], stdin = PIPE, stdout = PIPE, stderr = sys.stderr)
-bashed = bash.communicate(bashed)[0]
-
-if bash.returncode != 0:
-    sys.exit(bash.returncode)
-
-bashed = bashed.decode(encoding, 'error').split('\n')
-pped = []
-lineno = -1
-
-for line in bashed:
-    no = -1
-    if line.startswith('\033'):
-        no = int(line[1:].split('\033')[0])
-        line = '\033'.join(line[1:].split('\033')[1:])
-    if no > lineno:
-        while no != lineno + 1:
-            pped.append('')
-            lineno += 1
-    pped.append(line)
-    lineno += 1
+for _ in range(iterations):
+    entered = False
+    bashed = []
+    
+    for lineno in range(len(data)):
+        line = data[lineno]
+        if line.startswith(symbol + '<'):
+            bashed.append(line[2:])
+            entered = True
+        elif line.startswith(symbol + '>'):
+            bashed.append(line[2:])
+            entered = False
+        elif entered:
+            bashed.append(line)
+        else:
+            line = '\'%s\'' % line.replace('\'', '\'\\\'\'')
+            bashed.append('echo $\'\\e%i\\e\'%s' % (lineno, pp(line)))
+    
+    bashed = '\n'.join(bashed).encode(encoding)
+    bash = Popen(["bash"], stdin = PIPE, stdout = PIPE, stderr = sys.stderr)
+    bashed = bash.communicate(bashed)[0]
+    
+    if bash.returncode != 0:
+        sys.exit(bash.returncode)
+    
+    bashed = bashed.decode(encoding, 'error').split('\n')
+    data = []
+    lineno = -1
+    
+    for line in bashed:
+        no = -1
+        if line.startswith('\033'):
+            no = int(line[1:].split('\033')[0])
+            line = '\033'.join(line[1:].split('\033')[1:])
+        if no > lineno:
+            while no != lineno + 1:
+                data.append('')
+                lineno += 1
+        data.append(line)
+        lineno += 1
 
 with open(output_file, 'wb') as file:
-    file.write('\n'.join(pped).encode(encoding))
+    file.write('\n'.join(data).encode(encoding))
     file.flush()
 
