@@ -8,6 +8,23 @@ encoding = 'utf-8'
 input_file = '/dev/stdin'
 output_file = '/dev/stdout'
 
+for i in range(1, len(sys.argv)):
+    arg = sys.argv[i]
+    i += 1
+    if   arg in ('-s', '--symbol'):    symbol      = sys.argv[i]
+    elif arg in ('-e', '--encoding'):  encoding    = sys.argv[i]
+    elif arg in ('-i', '--input'):     input_file  = sys.argv[i]
+    elif arg in ('-o', '--output'):    output_file = sys.argv[i]
+    elif arg in ('-f', '--file'):
+        input_file  = sys.argv[i]
+        output_file = sys.argv[i]
+    else:
+        continue
+    i += 1
+
+if input_file == '-':   input_file = '/dev/stdin'
+if output_file == '-':  output_file = '/dev/stdout'
+
 data = None
 with open(input_file, 'rb') as file:
     data = file.read().decode(encoding, 'error').split('\n')
