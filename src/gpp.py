@@ -5,16 +5,18 @@ from subprocess import Popen, PIPE
 
 symbol = '@'
 encoding = 'utf-8'
+iterations = 1
 input_file = '/dev/stdin'
 output_file = '/dev/stdout'
 
 for i in range(1, len(sys.argv)):
     arg = sys.argv[i]
     i += 1
-    if   arg in ('-s', '--symbol'):    symbol      = sys.argv[i]
-    elif arg in ('-e', '--encoding'):  encoding    = sys.argv[i]
-    elif arg in ('-i', '--input'):     input_file  = sys.argv[i]
-    elif arg in ('-o', '--output'):    output_file = sys.argv[i]
+    if   arg in ('-s', '--symbol'):     symbol      = sys.argv[i]
+    elif arg in ('-e', '--encoding'):   encoding    = sys.argv[i]
+    else arg in ('-n', '--iterations')  iterations  = int(sys.argv[i])
+    elif arg in ('-i', '--input'):      input_file  = sys.argv[i]
+    elif arg in ('-o', '--output'):     output_file = sys.argv[i]
     elif arg in ('-f', '--file'):
         input_file  = sys.argv[i]
         output_file = sys.argv[i]
@@ -24,6 +26,15 @@ for i in range(1, len(sys.argv)):
 
 if input_file == '-':   input_file = '/dev/stdin'
 if output_file == '-':  output_file = '/dev/stdout'
+
+if iterations < 1:
+    if input_file != output_file:
+        data = None
+        with open(input_file, 'rb') as file:
+            data = file.read()
+        with open(write_file, 'wb') as file:
+            file.write(data)
+    sys.exit(0)
 
 data = None
 with open(input_file, 'rb') as file:
