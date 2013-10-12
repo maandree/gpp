@@ -56,7 +56,7 @@ with open(input_file, 'rb') as file:
 
 if unshebang:
     if data[0][:2] == '#!':
-        data[:] = data[1:]
+        data[0] = ''
 
 def pp(line):
     rc = ''
