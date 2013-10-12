@@ -52,6 +52,12 @@ for i in range(1, len(args)):
     elif arg in ('-f', '--file'):
         input_file  = sys.argv[i]
         output_file = sys.argv[i]
+    elif arg in ('-D', '--export'):
+        export = sys.argv[i]
+        if '=' not in export:
+            export += '=1'
+        export = (export.split('=')[0], '='.join(export.split('=')[1:]))
+        os.putenv(export[0], export[1])
     elif arg in ('-v', '--version'):
         print('gpp ' + VERSION)
         sys.exit(0)
