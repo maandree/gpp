@@ -19,7 +19,7 @@ _command=gpp ## change this if you have a package conflicting package
 
 build() {
         cd "${srcdir}/gpp-${pkgver}"
-        make PREFIX="${_prefix}" PKGNAME="${pkgname}" COMMAND="${_command}" "DESTDIR="${pkgdir}"
+        make PREFIX="${_prefix}" PKGNAME="${pkgname}" COMMAND="${_command}" DESTDIR="${pkgdir}"
 }
 
 package() {
