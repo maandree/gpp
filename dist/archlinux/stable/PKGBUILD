@@ -19,12 +19,12 @@ _command=gpp ## change this if you have a package conflicting package
 
 build() {
         cd "${srcdir}/gpp-${pkgver}"
-        make PREFIX="${_prefix}" PKGNAME="${pkgname}" COMMAND="${_command} "DESTDIR="${pkgdir}"
+        make PREFIX="${_prefix}" PKGNAME="${pkgname}" COMMAND="${_command}" "DESTDIR="${pkgdir}"
 }
 
 package() {
         cd "${srcdir}/gpp-${pkgver}"
-        make PREFIX="${_prefix}" PKGNAME="${pkgname}" COMMAND="${_command} DESTDIR="${pkgdir}" install
+        make PREFIX="${_prefix}" PKGNAME="${pkgname}" COMMAND="${_command}" DESTDIR="${pkgdir}" install
         _dir="${pkgdir}${_prefix}/share/licenses/${pkgname}"
         ln -sf -- "/usr/share/licenses/common/GPL3" "${_dir}/LICENSE"
 }
