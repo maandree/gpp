@@ -60,7 +60,100 @@ Texts. A copy of the license is included in the section entitled
 @node Overview
 @chapter Overview
 
-FIXME
+General Preprocessor (gpp) is a preprocessor
+based on GNU Bash that can be used for anything.
+
+By default an at-sign (@@) is used as prefix
+for preprocessor directives, but any single
+single character can be used. If the prefix
+symbol is directly followed by itself it results
+to the symbol itself rather than a preprocessor
+directive.
+
+A file written with gpp contains, text that
+can be in any format, gpp does not care how
+it is formated, and lines written in GNU Bash
+that are executed and termine which part of
+the text should be keept and how it should
+be repeated. A line can also be partially
+written in GNU Bash to modify it. Each line
+that is not in GNU Bash as actually treated
+as a echo instruction.
+
+To create a preprocess directive, begin the
+line with @code{@@>}. For example, the follow
+code will only keep the `Hello world' line
+if the environment variable @var{HELLO} is
+defined and is not empty.
+
+@example
+@@>[ -z "$HELLO" ] &&
+Hello world
+@end example
+
+If you want to write a mutliline preprocessor
+directive you can begin the first line with
+@code{@@<} and begin the last line with
+@code{@@>}, instead of having each line start
+with @code{@@>}. For example, if you want
+to create a preprocess function to make a
+ASCII text uppercase you can write:
+
+@example
+@@>uppercase () @{
+    lower=qwertyuiopasdfghjklzxcvbnm
+    upper=QWERTYUIOPASDFGHJKLZXCVBNM
+    sed y/$lower/$upper/ <<<"$*"
+@@<@}
+@end example
+
+Now assume that you have this @command{uppercase}
+preprocessor function defined on the top of a
+document. Also assume that you are logged in
+as the user `twilight' and therefor have the
+environment variable @var{USER} set to `twilight'.
+
+If you in the document, below the definition
+of @command{uppercase}, insert the line
+
+@example
+Your are logged in as @@(uppercase $USER).
+@end example
+
+After preprocessing it will say
+
+@example
+Your are logged in as TWILIGHT.
+@end example
+
+@@(...) can be used inline. It executes a
+command that can either be defined as a
+preprocessor function or be an external program.
+Preprocossor directives cannot be used inside
+it, everything in it is in GNU Bash.
+
+@@{...} is another inline preprocessor directive,
+you can put the name of a preprocessor variable
+or environment variable inside it to get the
+variable's value. For example, if you are
+logged in as `twilight'
+
+@example
+Your are logged in as @@{USER}.
+@end example
+
+will after preprocessing say
+
+@example
+Your are logged in as twilight.
+@end example
+
+The preprocessor will try to keep the lines in
+the output files in the same position as in
+the source files. This will however stop to
+work if the processor directives includes
+loops or instructions that returns multiple
+lines.
 
 
 
