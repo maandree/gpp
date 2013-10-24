@@ -14,4 +14,5 @@ __pycache__/
 /gpp
 *.info
 *.gz
+*.install
 

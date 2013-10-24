@@ -2,7 +2,7 @@
 
 @c %**start of header
 @setfilename gpp.info
-@settitle gpp
+@settitle ?{GPP}
 @afourpaper
 @documentencoding UTF-8
 @documentlanguage en
@@ -12,7 +12,7 @@
 
 @dircategory Development
 @direntry
-* gpp: (gpp).          Bash based preprocessor for anything
+* ?{GPP}: (?{GPP}).          Bash based preprocessor for anything
 @end direntry
 
 
@@ -50,9 +50,9 @@ Texts. A copy of the license is included in the section entitled
 
 
 @menu
-* Overview::                        Brief overview of @command{gpp}.
-* Invoking::                        Invoking @command{gpp}.
-* Syntax::                          Syntax of @command{gpp}.
+* Overview::                        Brief overview of @command{?{GPP}}.
+* Invoking::                        Invoking @command{?{GPP}}.
+* Syntax::                          Syntax of @command{?{GPP}}.
 * GNU Free Documentation License::  Copying and sharing this manual.
 @end menu
 
@@ -93,8 +93,8 @@ lines.
 @node Invoking
 @chapter Invoking
 
-Syntax for invoking @command{gpp}:
-@command{gpp [options...]}
+Syntax for invoking @command{?{GPP}}:
+@command {?{GPP} [options...]}
 
 Short options must not be joined and
 the value for a flag must be in a

@@ -24,9 +24,12 @@ doc: info
 .PHONY: info
 info: gpp.info.gz
 
-%.info.gz: info/%.texinfo
+%.info.gz: info/%.texinfo.install
 	makeinfo "$<"
 	gzip -9 -f "$*.info"
+
+info/%.texinfo.install: info/%.texinfo
+	$(PY3) gpp -s '?' -D GPP=$(COMMAND) < "$<" > "$@"
 
 gpp: src/gpp.py
 	VERSION=$(VERSION) SHEBANG="$(SHEBANG)" $(PY3) "$<" -u -u < "$<" > "$@"
