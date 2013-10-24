@@ -51,8 +51,8 @@ Texts. A copy of the license is included in the section entitled
 
 @menu
 * Overview::                        Brief overview of @command{gpp}.
-* Invoking::                        Invoking @command{gpp}
-* Syntax::                        Syntax of @command{gpp}
+* Invoking::                        Invoking @command{gpp}.
+* Syntax::                          Syntax of @command{gpp}.
 * GNU Free Documentation License::  Copying and sharing this manual.
 @end menu
 
