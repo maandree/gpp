@@ -118,9 +118,19 @@ Number of iterations to run the preprocessing in. (Default: 1)
 
 @item -u
 @itemx --unshebang
-Bland out the shebang line. Notice that the line is not removed,
+Blank out the shebang line. Notice that the line is not removed,
 it is just cleared. You can use a shebang line make gpp preprocess
 the file when executed.
+
+If @option{--unshebang} is used twice, the second line in the
+file will be moved up to the top of the file and the initial
+shebang line will be removed. A blank line will be inserted
+after the new top line will be added to keep the line numbers
+in the output file as near as possible to the line numbers
+in the input file. The intension of this option is that you
+can have two shebang lines, one on the first line for preprocessing
+when the file is executed, and one shebang line on the second
+line for output file.
 
 @item -i
 @itemx --input

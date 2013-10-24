@@ -29,7 +29,7 @@ encoding = 'utf-8'
 iterations = 1
 input_file = '/dev/stdin'
 output_file = '/dev/stdout'
-unshebang = False
+unshebang = 0
 
 args = sys.argv
 
@@ -46,7 +46,7 @@ for i in range(1, len(args)):
     if   arg in ('-s', '--symbol'):      symbol      = sys.argv[i]
     elif arg in ('-e', '--encoding'):    encoding    = sys.argv[i]
     elif arg in ('-n', '--iterations'):  iterations  = int(sys.argv[i])
-    elif arg in ('-u', '--unshebang'):   unshebang   = True; continue
+    elif arg in ('-u', '--unshebang'):   unshebang   += 1; continue
     elif arg in ('-i', '--input'):       input_file  = sys.argv[i]
     elif arg in ('-o', '--output'):      output_file = sys.argv[i]
     elif arg in ('-f', '--file'):
@@ -100,9 +100,14 @@ data = None
 with open(input_file, 'rb') as file:
     data = file.read().decode(encoding, 'error').split('\n')
 
-if unshebang:
+if unshebang == 1:
     if data[0][:2] == '#!':
         data[0] = ''
+
+if unshebang >= 2:
+    if data[0][:2] == '#!':
+        data[0] = data[1]
+        data[1] = ''
 
 def pp(line):
     rc = ''
