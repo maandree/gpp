@@ -10,7 +10,7 @@ DATA = /share
 BIN = /bin
 PKGNAME = gpp
 PY3 = python3
-SHEBANG = /usr/$(BIN)/env $(PY3)
+SHEBANG = /usr$(BIN)/env $(PY3)
 COMMAND = gpp
 LICENSES = $(DATA)/licenses
 
@@ -29,7 +29,7 @@ info: gpp.info.gz
 	gzip -9 -f "$*.info"
 
 gpp: src/gpp.py
-	VERSION=$(VERSION) $(PY3) "$<" < "$<" > "$@"
+	VERSION=$(VERSION) SHEBANG="$(SHEBANG)" $(PY3) "$<" -u -u < "$<" > "$@"
 
 .PHONY: install
 install: install-core install-doc

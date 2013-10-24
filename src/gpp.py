@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+#!@{SHEBANG}
 '''
 gpp – Bash based general purpose preprocessor
 
