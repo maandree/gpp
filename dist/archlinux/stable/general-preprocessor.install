@@ -1,4 +1,4 @@
-_file="gpp"
+_file="general-preprocessor"
 
 infodir="usr/share/info"
 file="${_file}.info.gz"

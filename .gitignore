@@ -3,7 +3,7 @@ bin/
 __pycache__/
 /dist/*/*/*
 !/dist/*/*/PKGBUILD
-!/dist/*/*/gpp.install
+!/dist/*/*/*.install
 .*
 !.git*
 \#*\#

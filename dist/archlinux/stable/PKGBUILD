@@ -1,6 +1,6 @@
 # Maintainer: Mattias Andrée <`base64 -d`(bWFhbmRyZWUK)@member.fsf.org>
 
-pkgname=gpp
+pkgname=general-preprocessor
 pkgver=1
 pkgrel=1
 pkgdesc="Bash based preprocessor for anything"
@@ -9,7 +9,7 @@ arch=(any)
 license=(GPL3)
 depends=(python bash)
 makedepends=(make coreutils python texinfo gzip)
-install=gpp.install
+install=general-preprocessor.install
 source=("${url}/archive/${pkgver}.tar.gz")
 sha256sums=(1f60c616624e4cbef9140f19b758c7132f509e50dc659ef133952f1e46ddab25)
 
