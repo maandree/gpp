@@ -93,7 +93,63 @@ lines.
 @node Invoking
 @chapter Invoking
 
-FIXME
+Syntax for invoking @command{gpp}:
+@command{gpp [options...]}
+
+Short options must not be joined and
+the value for a flag must be in a
+separate argument from the flag itself.
+
+For example, @option{--symbol=X} is not allowed,
+but @option{--symbol X} is.
+
+@table @option
+@item -s
+@itemx --symbol
+Set the prefix symbol for preprocessor directives. (Default: @@)
+
+@item -e
+@itemx --encoding
+Set the encoding of file. (Default: UTF-8)
+
+@item -n
+@itemx --iterations
+Number of iterations to run the preprocessing in. (Default: 1)
+
+@item -u
+@itemx --unshebang
+Bland out the shebang line. Notice that the line is not removed,
+it is just cleared. You can use a shebang line make gpp preprocess
+the file when executed.
+
+@item -i
+@itemx --input
+Set the input file. (Default: /dev/stdin)
+
+@item -o
+@itemx --output
+Set the output file. (Default: /dev/stdout)
+
+@item -f
+@itemx --file
+Set both input file and output file.
+
+@item -D
+@itemx --export
+Declare a environment variable. The syntax
+@code{NAME=VALUE} is used for the argument,
+but if the argument does not include an
+equals sign the value 1 will be used.
+
+@item -v
+@itemx --version
+Print program name and version and exit.
+
+@item -c
+@itemx --copying
+Print copyright notice and exit.
+
+@end table
 
 
 
