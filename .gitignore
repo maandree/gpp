@@ -8,4 +8,7 @@ __pycache__/
 *.sw[op]
 *.py[co]
 *.bak
+/gpp
+*.info
+*.gz
 
