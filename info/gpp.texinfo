@@ -52,6 +52,7 @@ Texts. A copy of the license is included in the section entitled
 @menu
 * Overview::                        Brief overview of @command{gpp}.
 * Invoking::                        Invoking @command{gpp}
+* Syntax::                        Syntax of @command{gpp}
 * GNU Free Documentation License::  Copying and sharing this manual.
 @end menu
 
@@ -79,6 +80,25 @@ be repeated. A line can also be partially
 written in GNU Bash to modify it. Each line
 that is not in GNU Bash as actually treated
 as a echo instruction.
+
+The preprocessor will try to keep the lines in
+the output files in the same position as in
+the source files. This will however stop to
+work if the processor directives includes
+loops or instructions that returns multiple
+lines.
+
+
+
+@node Invoking
+@chapter Invoking
+
+FIXME
+
+
+
+@node Syntax
+@chapter Syntax
 
 To create a preprocess directive, begin the
 line with @code{@@>}. For example, the follow
@@ -147,20 +167,6 @@ will after preprocessing say
 @example
 Your are logged in as twilight.
 @end example
-
-The preprocessor will try to keep the lines in
-the output files in the same position as in
-the source files. This will however stop to
-work if the processor directives includes
-loops or instructions that returns multiple
-lines.
-
-
-
-@node Invoking
-@chapter Invoking
-
-FIXME
 
 
 
