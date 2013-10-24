@@ -218,14 +218,14 @@ preprocessor function or be an external program.
 Preprocossor directives cannot be used inside
 it, everything in it is in GNU Bash.
 
-@@{...} is another inline preprocessor directive,
+@@@{...@} is another inline preprocessor directive,
 you can put the name of a preprocessor variable
 or environment variable inside it to get the
 variable's value. For example, if you are
 logged in as `twilight'
 
 @example
-Your are logged in as @@{USER}.
+Your are logged in as @@@{USER@}.
 @end example
 
 will after preprocessing say
