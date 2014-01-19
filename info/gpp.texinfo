@@ -186,11 +186,11 @@ to create a preprocess function to make a
 ASCII text uppercase you can write:
 
 @example
-@@>uppercase () @{
+@@<uppercase () @{
     lower=qwertyuiopasdfghjklzxcvbnm
     upper=QWERTYUIOPASDFGHJKLZXCVBNM
     sed y/$lower/$upper/ <<<"$*"
-@@<@}
+@@>@}
 @end example
 
 Now assume that you have this @command{uppercase}
