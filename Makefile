@@ -22,11 +22,10 @@ all: gpp doc
 doc: info
 
 .PHONY: info
-info: gpp.info.gz
+info: gpp.info
 
-%.info.gz: info/%.texinfo.install
+%.info: info/%.texinfo.install
 	makeinfo "$<"
-	gzip -9 -f "$*.info"
 
 info/%.texinfo.install: info/%.texinfo
 	$(PY3) gpp -s '?' -D GPP=$(COMMAND) < "$<" > "$@"
@@ -54,9 +53,9 @@ install-license:
 install-doc: install-info
 
 .PHONY: install-info
-install-info: gpp.info.gz
+install-info: gpp.info
 	install -dm755 -- "$(DESTDIR)$(PREFIX)$(DATA)/info"
-	install -m644 gpp.info.gz -- "$(DESTDIR)$(PREFIX)$(DATA)/info/$(PKGNAME).info.gz"
+	install -m644 gpp.info -- "$(DESTDIR)$(PREFIX)$(DATA)/info/$(PKGNAME).info"
 
 .PHONY: uninstall
 uninstall:
@@ -64,9 +63,9 @@ uninstall:
 	-rm -- "$(DESTDIR)$(PREFIX)$(LICENSES)/$(PKGNAME)/COPYING"
 	-rm -- "$(DESTDIR)$(PREFIX)$(LICENSES)/$(PKGNAME)/LICENSE"
 	-rmdir -- "$(DESTDIR)$(PREFIX)$(LICENSES)/$(PKGNAME)"
-	-rm -- "$(DESTDIR)$(PREFIX)$(DATA)/info/$(PKGNAME).info.gz"
+	-rm -- "$(DESTDIR)$(PREFIX)$(DATA)/info/$(PKGNAME).info"
 
 .PHONY: clean
 clean:
-	-rm -f gpp gpp.info gpp.info.gz
+	-rm -f gpp gpp.info
 
