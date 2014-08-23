@@ -94,7 +94,7 @@ lines.
 @chapter Invoking
 
 Syntax for invoking @command{?{GPP}}:
-@command {?{GPP} [options...]}
+@command{?{GPP} [options...]}
 
 Short options must not be joined and
 the value for a flag must be in a

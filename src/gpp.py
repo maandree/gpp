@@ -1,9 +1,9 @@
-#!/usr/bin/env python3
 #!@{SHEBANG}
+# -*- coding: utf-8 -*-
 '''
 gpp – Bash based general purpose preprocessor
 
-Copyright © 2013  Mattias Andrée (maandree@member.fsf.org)
+Copyright © 2013, 2014  Mattias Andrée (maandree@member.fsf.org)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -25,8 +25,21 @@ import sys
 import shlex
 from subprocess import Popen, PIPE
 
+if sys.version_info.major < 3:
+    def bytes(string):
+        r = bytearray(len(string))
+        b = buffer(r)
+        r[:] = string
+        return r
+
+if sys.version_info.major < 3:
+    def bytelist(string):
+        return [ord(c) for c in string]
+else:
+    bytelist = list
+
 symbol = '@'
-encoding = 'utf-8'
+encoding = sys.getdefaultencoding()
 iterations = 1
 input_file = '/dev/stdin'
 output_file = '/dev/stdout'
@@ -63,9 +76,9 @@ for i in range(1, len(args)):
         print('gpp ' + VERSION)
         sys.exit(0)
     elif arg in ('-c', '--copying'):
-        print('gpp – Bash based general purpose preprocessor')
+        print('gpp -- Bash based general purpose preprocessor')
         print('')
-        print('Copyright © 2013  Mattias Andrée (maandree@member.fsf.org)')
+        print('Copyright (C) 2013, 2014  Mattias Andrée (maandree@member.fsf.org)')
         print('')
         print('This program is free software: you can redistribute it and/or modify')
         print('it under the terms of the GNU General Public License as published by')
@@ -87,6 +100,9 @@ for i in range(1, len(args)):
 if input_file == '-':   input_file = '/dev/stdin'
 if output_file == '-':  output_file = '/dev/stdout'
 
+symbol = bytelist(symbol.encode(encoding))
+symlen = len(symbol)
+
 if iterations < 1:
     if input_file != output_file:
         data = None
@@ -97,72 +113,98 @@ if iterations < 1:
             file.flush()
     sys.exit(0)
 
+def linesplit(bs):
+    rc = []
+    elem = []
+    for b in bs:
+        if b == 10:
+            rc.append(elem)
+            elem = []
+        else:
+            elem.append(b)
+    rc.append(elem)
+    return rc
+
+def linejoin(bss):
+    rc = []
+    if len(bss) > 0:
+        rc += bss[0]
+    for bs in bss[1:]:
+        rc.append(10)
+        rc += bs
+    return rc
+
 data = None
 with open(input_file, 'rb') as file:
-    data = file.read().decode(encoding, 'error').split('\n')
+    data = file.read()
+data = linesplit(bytelist(data))
 
 if unshebang == 1:
-    if data[0][:2] == '#!':
-        data[0] = ''
+    if (len(data[0]) >= 2) and (data[0][0] == ord('#')) and (data[0][1] == ord('!')):
+        data[0] = []
 
 if unshebang >= 2:
-    if data[0][:2] == '#!':
+    if (len(data[0]) >= 2) and (data[0][0] == ord('#')) and (data[0][1] == ord('!')):
         data[0] = data[1]
-        data[1] = ''
+        data[1] = []
 
 def pp(line):
-    rc = ''
+    rc = []
     symb = False
     brackets = 0
     esc = False
     dollar = False
     quote = []
-    for c in line:
+    for i in range(len(line)):
+        c = line[i]
         if brackets > 0:
             if esc:
                 esc = False
-            elif (c == ')') or (c == '}'):
+            elif (c in (ord(')'), ord('}'))):
                 brackets -= 1
                 if brackets == 0:
-                    rc += c + '"\''
+                    rc.append(c)
+                    rc.append(ord('"'))
+                    rc.append(ord('\''))
                     continue
-            elif (c == '(') or (c == '{'):
+            elif (c in (ord('('), ord('{'))):
                 brackets += 1
-            elif c == '\\':
+            elif c == ord('\\'):
                 esc = True
-            rc += c
+            rc.append(c)
         elif symb:
             symb = False
-            if (c == '(') or (c == '{'):
+            if (c in (ord('('), ord('{'))):
                 brackets += 1
-                rc += '\'"$' + c
-            else:
-                rc += c
-        elif c == symbol:
+                rc.append(ord('\''))
+                rc.append(ord('"'))
+                rc.append(ord('$'))
+            rc.append(c)
+        elif line[i : i + symlen] == symbol:
             symb = True
         elif len(quote) > 0:
             if esc:
                 esc = False
             elif dollar:
                 dollar = False
-                if c == '(':
-                    quote.append(')')
-                elif c == '{':
-                    quote.append('}')
+                if c == ord('('):
+                    quote.append(ord(')'))
+                elif c == ord('{'):
+                    quote.append(ord('}'))
             elif c == quote[-1]:
                 quote[:] = quote[:-1]
-            elif (quote[-1] in ')}') and (c in '\'"`'):
+            elif (quote[-1] in (ord(')'), ord('}'))) and (c in (ord('"'), ord('\''), ord('`'))):
                 quote.append(c)
-            elif (c == '\\') and (quote[-1] != "'"):
+            elif (c == ord('\\')) and (quote[-1] != ord('\'')):
                 esc = True
-            elif c == '$':
+            elif c == ord('$'):
                 dollar = True
-            rc += c
-        elif (c == '"') or (c == "'") or (c == '`'):
+            rc.append(c)
+        elif c in (ord('"'), ord('\''), ord('`')):
             quote.append(c)
-            rc += c
+            rc.append(c)
         else:
-            rc += c
+            rc.append(c)
     return rc
 
 for _ in range(iterations):
@@ -171,42 +213,54 @@ for _ in range(iterations):
     
     for lineno in range(len(data)):
         line = data[lineno]
-        if line.startswith(symbol + '<'):
+        if (len(line) > symlen) and (line[:symlen] == symbol) and (line[symlen] in (ord('<'), ord('>'))):
             bashed.append(line[2:])
-            entered = True
-        elif line.startswith(symbol + '>'):
-            bashed.append(line[2:])
-            entered = False
+            entered = line[symlen] == ord('<')
         elif entered:
             bashed.append(line)
         else:
-            line = '\'%s\'' % line.replace('\'', '\'\\\'\'')
-            bashed.append('echo $\'\\e%i\\e\'%s' % (lineno, pp(line)))
+            buf = []
+            for c in line:
+                if c == ord('\''):
+                    buf.append(c)
+                    buf.append(ord('\\'))
+                    buf.append(c)
+                    buf.append(c)
+                else:
+                    buf.append(c)
+            line = [ord('\'')] + buf + [ord('\'')]
+            buf = bytelist(('echo $\'\\e%i\\e\'' % lineno).encode())
+            bashed.append(buf + pp(line))
     
-    bashed = '\n'.join(bashed).encode(encoding)
+    bashed = bytes(linejoin(bashed))
     bash = Popen(["bash"], stdin = PIPE, stdout = PIPE, stderr = sys.stderr)
     bashed = bash.communicate(bashed)[0]
     
     if bash.returncode != 0:
         sys.exit(bash.returncode)
     
-    bashed = bashed.decode(encoding, 'error').split('\n')
+    bashed = linesplit(bytelist(bashed))
     data = []
     lineno = -1
     
     for line in bashed:
         no = -1
-        if line.startswith('\033'):
-            no = int(line[1:].split('\033')[0])
-            line = '\033'.join(line[1:].split('\033')[1:])
+        if (len(line) > 0) and (line[0] == 0o33):
+            no = 0
+            for i in range(1, len(line)):
+                if line[i] == 0o33:
+                    line = line[i + 1:]
+                    break
+                no = no * 10 + (line[i] - ord('0'))
         if no > lineno:
             while no != lineno + 1:
-                data.append('')
+                data.append([])
                 lineno += 1
         data.append(line)
         lineno += 1
 
+data = bytes(linejoin(data))
 with open(output_file, 'wb') as file:
-    file.write('\n'.join(data).encode(encoding))
+    file.write(data)
     file.flush()
 

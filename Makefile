@@ -9,8 +9,8 @@ PREFIX = /usr
 DATA = /share
 BIN = /bin
 PKGNAME = gpp
-PY3 = python3
-SHEBANG = /usr$(BIN)/env $(PY3)
+PY = python3
+SHEBANG = /usr$(BIN)/env $(PY)
 COMMAND = gpp
 LICENSES = $(DATA)/licenses
 
@@ -28,10 +28,10 @@ info: gpp.info
 	makeinfo "$<"
 
 info/%.texinfo.install: info/%.texinfo
-	$(PY3) gpp -s '?' -D GPP=$(COMMAND) < "$<" > "$@"
+	$(PY) gpp -s '?' -D GPP=$(COMMAND) < "$<" > "$@"
 
 gpp: src/gpp.py
-	VERSION=$(VERSION) SHEBANG="$(SHEBANG)" $(PY3) "$<" -u -u < "$<" > "$@"
+	VERSION='$(VERSION)' SHEBANG='$(SHEBANG)' $(PY) "$<" < "$<" > "$@"
 
 .PHONY: install
 install: install-core install-doc
@@ -67,5 +67,5 @@ uninstall:
 
 .PHONY: clean
 clean:
-	-rm -f gpp gpp.info
+	-rm -f gpp gpp.info *.install* info/*.install
 
