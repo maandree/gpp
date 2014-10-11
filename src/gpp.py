@@ -155,8 +155,11 @@ def pp(line):
     esc = False
     dollar = False
     quote = []
-    for i in range(len(line)):
+    n = len(line)
+    i = 0
+    while i < n:
         c = line[i]
+        i += 1
         if brackets > 0:
             if esc:
                 esc = False
@@ -180,8 +183,9 @@ def pp(line):
                 rc.append(ord('"'))
                 rc.append(ord('$'))
             rc.append(c)
-        elif line[i : i + symlen] == symbol:
+        elif line[i - 1 : i + symlen - 1] == symbol:
             symb = True
+            i += symlen - 1
         elif len(quote) > 0:
             if esc:
                 esc = False
@@ -214,7 +218,7 @@ for _ in range(iterations):
     for lineno in range(len(data)):
         line = data[lineno]
         if (len(line) > symlen) and (line[:symlen] == symbol) and (line[symlen] in (ord('<'), ord('>'))):
-            bashed.append(line[2:])
+            bashed.append(line[symlen + 1:])
             entered = line[symlen] == ord('<')
         elif entered:
             bashed.append(line)
