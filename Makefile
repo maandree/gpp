@@ -3,7 +3,7 @@
 # notice and this notice are preserved.  This file is offered as-is,
 # without any warranty.
 
-VERSION = 1
+VERSION = 1.2
 
 PREFIX = /usr
 DATA = /share
