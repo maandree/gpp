@@ -185,6 +185,12 @@ def pp(line):
                 rc.append(ord('\''))
                 rc.append(ord('"'))
                 rc.append(ord('$'))
+            else:
+                rc += symbol
+            if c == ord('\''):
+                rc.append(c)
+                rc.append(ord('\\'))
+                rc.append(c)
             rc.append(c)
         elif line[i - 1 : i + symlen - 1] == symbol:
             symb = True
