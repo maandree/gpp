@@ -1,7 +1,7 @@
 # Maintainer: Mattias Andrée <`base64 -d`(bWFhbmRyZWUK)@member.fsf.org>
 
 pkgname=general-preprocessor
-pkgver=1.3
+pkgver=1.4
 pkgrel=1
 pkgdesc="Bash-based preprocessor for anything"
 url="https://github.com/maandree/gpp"
