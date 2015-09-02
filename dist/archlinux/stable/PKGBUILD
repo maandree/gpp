@@ -3,7 +3,7 @@
 pkgname=general-preprocessor
 pkgver=1.3
 pkgrel=1
-pkgdesc="Bash based preprocessor for anything"
+pkgdesc="Bash-based preprocessor for anything"
 url="https://github.com/maandree/gpp"
 arch=(any)
 license=(GPL3)

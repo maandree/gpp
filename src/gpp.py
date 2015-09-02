@@ -1,9 +1,9 @@
 #!@{SHEBANG}
 # -*- coding: utf-8 -*-
-'''
-gpp – Bash based general purpose preprocessor
+copyright = '''
+gpp – Bash-based general-purpose preprocessor
 
-Copyright © 2013, 2014  Mattias Andrée (maandree@member.fsf.org)
+Copyright © 2013, 2014, 2015  Mattias Andrée (maandree@member.fsf.org)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -76,22 +76,7 @@ for i in range(1, len(args)):
         print('gpp ' + VERSION)
         sys.exit(0)
     elif arg in ('-c', '--copying'):
-        print('gpp -- Bash based general purpose preprocessor')
-        print('')
-        print('Copyright (C) 2013, 2014  Mattias Andrée (maandree@member.fsf.org)')
-        print('')
-        print('This program is free software: you can redistribute it and/or modify')
-        print('it under the terms of the GNU General Public License as published by')
-        print('the Free Software Foundation, either version 3 of the License, or')
-        print('(at your option) any later version.')
-        print('')
-        print('This program is distributed in the hope that it will be useful,')
-        print('but WITHOUT ANY WARRANTY; without even the implied warranty of')
-        print('MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the')
-        print('GNU General Public License for more details.')
-        print('')
-        print('You should have received a copy of the GNU General Public License')
-        print('along with this program.  If not, see <http://www.gnu.org/licenses/>.')
+        print(copyright[1:-1])
         sys.exit(0)
     else:
         continue
@@ -157,27 +142,45 @@ def pp(line):
     quote = []
     n = len(line)
     i = 0
+    rc.append(ord('\''))
     while i < n:
         c = line[i]
         i += 1
         if brackets > 0:
             if esc:
                 esc = False
-            elif (c in (ord(')'), ord('}'))):
+            elif len(quote) > 0:
+                if dollar:
+                    dollar = False
+                    if c == ord('('):
+                        quote.append(ord(')'))
+                    elif c == ord('{'):
+                        quote.append(ord('}'))
+                elif c == quote[-1]:
+                    quote[:] = quote[:-1]
+                elif (quote[-1] in (ord(')'), ord('}'))) and (c in (ord('"'), ord('\''), ord('`'))):
+                    quote.append(c)
+                elif (c == ord('\\')) and (quote[-1] != ord('\'')):
+                    esc = True
+                elif c == ord('$'):
+                    dollar = True
+            elif c in (ord('"'), ord('\''), ord('`')):
+                quote.append(c)
+            elif c in (ord(')'), ord('}')):
                 brackets -= 1
                 if brackets == 0:
                     rc.append(c)
                     rc.append(ord('"'))
                     rc.append(ord('\''))
                     continue
-            elif (c in (ord('('), ord('{'))):
+            elif c in (ord('('), ord('{')):
                 brackets += 1
             elif c == ord('\\'):
                 esc = True
             rc.append(c)
         elif symb:
             symb = False
-            if (c in (ord('('), ord('{'))):
+            if c in (ord('('), ord('{')):
                 brackets += 1
                 rc.append(ord('\''))
                 rc.append(ord('"'))
@@ -186,29 +189,14 @@ def pp(line):
         elif line[i - 1 : i + symlen - 1] == symbol:
             symb = True
             i += symlen - 1
-        elif len(quote) > 0:
-            if esc:
-                esc = False
-            elif dollar:
-                dollar = False
-                if c == ord('('):
-                    quote.append(ord(')'))
-                elif c == ord('{'):
-                    quote.append(ord('}'))
-            elif c == quote[-1]:
-                quote[:] = quote[:-1]
-            elif (quote[-1] in (ord(')'), ord('}'))) and (c in (ord('"'), ord('\''), ord('`'))):
-                quote.append(c)
-            elif (c == ord('\\')) and (quote[-1] != ord('\'')):
-                esc = True
-            elif c == ord('$'):
-                dollar = True
+        elif c == ord('\''):
             rc.append(c)
-        elif c in (ord('"'), ord('\''), ord('`')):
-            quote.append(c)
+            rc.append(ord('\\'))
+            rc.append(c)
             rc.append(c)
         else:
             rc.append(c)
+    rc.append(ord('\''))
     return rc
 
 for _ in range(iterations):
@@ -223,16 +211,6 @@ for _ in range(iterations):
         elif entered:
             bashed.append(line)
         else:
-            buf = []
-            for c in line:
-                if c == ord('\''):
-                    buf.append(c)
-                    buf.append(ord('\\'))
-                    buf.append(c)
-                    buf.append(c)
-                else:
-                    buf.append(c)
-            line = [ord('\'')] + buf + [ord('\'')]
             buf = bytelist(('echo $\'\\e%i\\e\'' % lineno).encode())
             bashed.append(buf + pp(line))
     

@@ -1,0 +1,7 @@
+@<set -v  # the last line should not appear, unless you have a $()$() command
+@>
+@>h=H
+
+'@{h}ello @(echo `echo 'W'`"o$(echo $(echo r))"'ld!')'
+@('$()$()')
+

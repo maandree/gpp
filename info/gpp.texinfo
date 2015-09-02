@@ -12,12 +12,12 @@
 
 @dircategory Development
 @direntry
-* ?{GPP}: (?{GPP}).          Bash based preprocessor for anything
+* ?{GPP}: (?{GPP}).          Bash-based preprocessor for anything
 @end direntry
 
 
 @copying
-Copyright @copyright{} 2013 Mattias Andrée
+Copyright @copyright{} 2013, 2015 Mattias Andrée
 
 @quotation
 Permission is granted to copy, distribute and/or modify this document
@@ -31,13 +31,13 @@ Texts. A copy of the license is included in the section entitled
 
 @ifnottex
 @node Top
-@top gpp -- Bash based preprocessor for anything
+@top gpp -- Bash-based preprocessor for anything
 @insertcopying
 @end ifnottex
 
 @titlepage
 @title gpp
-@subtitle Bash based preprocessor for anything
+@subtitle Bash-based preprocessor for anything
 @author by Mattias Andrée (maandree)
 
 @page

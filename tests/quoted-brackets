@@ -1,0 +1,3 @@
+@>set -v
+'ello @(echo 'wo(rld')!!!
+'ello @(echo 'wo)rld')!!!
