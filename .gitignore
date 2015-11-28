@@ -1,5 +1,6 @@
 _/
-bin/
+/bin/
+/obj/
 __pycache__/
 /dist/*/*/*
 !/dist/*/*/PKGBUILD

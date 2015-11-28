@@ -3,69 +3,141 @@
 # notice and this notice are preserved.  This file is offered as-is,
 # without any warranty.
 
-VERSION = 1.4
+VERSION = 1.5
 
 PREFIX = /usr
-DATA = /share
 BIN = /bin
+DATA = /share
+BINDIR = $(PREFIX)$(BIN)
+DATADIR = $(PREFIX)$(DATA)
+DOCDIR = $(DATADIR)/doc
+INFODIR = $(DATADIR)/info
+MANDIR = $(DATADIR)/man
+MAN1DIR = $(MANDIR)/man1
+LICENSEDIR = $(DATADIR)/licenses
+
 PKGNAME = gpp
+COMMAND = gpp
+
 PY = python
 SHEBANG = /usr$(BIN)/env $(PY)
-COMMAND = gpp
-LICENSES = $(DATA)/licenses
 
+
+.PHONY: default
+default: cmd info
 
 .PHONY: all
-all: gpp doc
+all: cmd doc
+
+.PHONY: cmd
+cmd: bin/gpp
+
+bin/gpp: src/gpp.py
+	@mkdir -p bin
+	env VERSION='$(VERSION)' SHEBANG='$(SHEBANG)' $(PY) "$<" < "$<" > "$@"
 
 .PHONY: doc
-doc: info
+doc: info pdf dvi ps
 
 .PHONY: info
-info: gpp.info
+info: bin/gpp.info
+bin/%.info: obj/%.texinfo obj/fdl.texinfo
+	@mkdir -p bin
+	$(MAKEINFO) $<
+	mv $*.info $@
 
-%.info: info/%.texinfo.install
-	makeinfo "$<"
+.PHONY: pdf
+pdf: bin/gpp.pdf
+bin/%.pdf: obj/%.texinfo obj/fdl.texinfo
+	@! test -d obj/pdf || rm -rf obj/pdf
+	@mkdir -p bin obj/pdf
+	cd obj/pdf && texi2pdf ../../"$<" < /dev/null
+	mv obj/pdf/$*.pdf $@
 
-info/%.texinfo.install: info/%.texinfo
-	$(PY) gpp -s '?' -D GPP=$(COMMAND) < "$<" > "$@"
+.PHONY: dvi
+dvi: bin/gpp.dvi
+bin/%.dvi: obj/%.texinfo obj/fdl.texinfo
+	@! test -d obj/dvi || rm -rf obj/dvi
+	@mkdir -p bin obj/dvi
+	cd obj/dvi && $(TEXI2DVI) ../../"$<" < /dev/null
+	mv obj/dvi/$*.dvi $@
 
-gpp: src/gpp.py
-	VERSION='$(VERSION)' SHEBANG='$(SHEBANG)' $(PY) "$<" < "$<" > "$@"
+.PHONY: ps
+ps: bin/gpp.ps
+bin/%.ps: obj/%.texinfo obj/fdl.texinfo
+	@! test -d obj/ps || rm -rf obj/ps
+	@mkdir -p bin obj/ps
+	cd obj/ps && texi2pdf --ps ../../"$<" < /dev/null
+	mv obj/ps/$*.ps $@
+
+obj/gpp.texinfo: doc/info/gpp.texinfo bin/gpp
+	@mkdir -p obj
+	$(PY) bin/gpp -s '?' -D GPP=$(COMMAND) < "$<" > "$@"
+
+obj/fdl.texinfo: doc/info/fdl.texinfo
+	@mkdir -p obj
+	cp "$<" "$@"
+
+
 
 .PHONY: install
-install: install-core install-doc
+install: install-core install-info
+
+.PHONY: install
+install-all: install-core install-doc
 
 .PHONY: install-core
 install-core: install-cmd install-license
 
 .PHONY: install-cmd
-install-cmd: gpp
-	install -dm755 -- "$(DESTDIR)$(PREFIX)$(BIN)"
-	install -m755 gpp -- "$(DESTDIR)$(PREFIX)$(BIN)/$(COMMAND)"
+install-cmd: bin/gpp
+	install -dm755 -- "$(DESTDIR)$(BINDIR)"
+	install -m755 $< -- "$(DESTDIR)$(BINDIR)/$(COMMAND)"
 
 .PHONY: install-license
 install-license:
-	install -dm755 -- "$(DESTDIR)$(PREFIX)$(LICENSES)/$(PKGNAME)"
-	install -m644 COPYING LICENSE -- "$(DESTDIR)$(PREFIX)$(LICENSES)/$(PKGNAME)"
+	install -dm755 -- "$(DESTDIR)$(LICENSEDIR)/$(PKGNAME)"
+	install -m644 COPYING LICENSE -- "$(DESTDIR)$(LICENSEDIR)/$(PKGNAME)"
 
 .PHONY: install-doc
-install-doc: install-info
+install-doc: install-info install-pdf install-dvi install-ps
 
 .PHONY: install-info
-install-info: gpp.info
-	install -dm755 -- "$(DESTDIR)$(PREFIX)$(DATA)/info"
-	install -m644 gpp.info -- "$(DESTDIR)$(PREFIX)$(DATA)/info/$(PKGNAME).info"
+install-info: bin/gpp.info
+	install -dm755 -- "$(DESTDIR)$(INFODIR)"
+	install -m644 $< -- "$(DESTDIR)$(INFODIR)/$(PKGNAME).info"
+
+.PHONY: install-pdf
+install-pdf: bin/gpp.pdf
+	install -dm755 -- "$(DESTDIR)$(DOCDIR)"
+	install -m644 -- "$<" "$(DESTDIR)$(DOCDIR)/$(PKGNAME).pdf"
+
+.PHONY: install-dvi
+install-dvi: bin/gpp.dvi
+	install -dm755 -- "$(DESTDIR)$(DOCDIR)"
+	install -m644 -- "$<" "$(DESTDIR)$(DOCDIR)/$(PKGNAME).dvi"
+
+.PHONY: install-ps
+install-ps: bin/gpp.ps
+	install -dm755 -- "$(DESTDIR)$(DOCDIR)"
+	install -m644 -- "$<" "$(DESTDIR)$(DOCDIR)/$(PKGNAME).ps"
+
+
 
 .PHONY: uninstall
 uninstall:
-	-rm -- "$(DESTDIR)$(PREFIX)$(BIN)/$(COMMAND)"
-	-rm -- "$(DESTDIR)$(PREFIX)$(LICENSES)/$(PKGNAME)/COPYING"
-	-rm -- "$(DESTDIR)$(PREFIX)$(LICENSES)/$(PKGNAME)/LICENSE"
-	-rmdir -- "$(DESTDIR)$(PREFIX)$(LICENSES)/$(PKGNAME)"
-	-rm -- "$(DESTDIR)$(PREFIX)$(DATA)/info/$(PKGNAME).info"
+	-rm -- "$(DESTDIR)$(BINDIR)/$(COMMAND)"
+	-rm -- "$(DESTDIR)$(LICENSEDIR)/$(PKGNAME)/COPYING"
+	-rm -- "$(DESTDIR)$(LICENSEDIR)/$(PKGNAME)/LICENSE"
+	-rmdir -- "$(DESTDIR)$(LICENSEDIR)/$(PKGNAME)"
+	-rm -- "$(DESTDIR)$(INFODIR)/$(PKGNAME).info"
+	-rm -- "$(DESTDIR)$(DOCDIR)/$(PKGNAME).pdf"
+	-rm -- "$(DESTDIR)$(DOCDIR)/$(PKGNAME).dvi"
+	-rm -- "$(DESTDIR)$(DOCDIR)/$(PKGNAME).ps"
+
+
 
 .PHONY: clean
 clean:
-	-rm -f gpp gpp.info *.install* info/*.install
+	-rm -r bin obj
 
