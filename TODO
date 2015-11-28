@@ -7,4 +7,15 @@ when a specific flag is used.
   Then add m10ᷜ number of empty lines
   at the top of the file, where k is large
   and n is the number specified above.
+  Because of line continuations and disc
+  resources it is best to implement this
+  in gpp.
+
+The option above should be aware of
+line continues using a backslash at
+the end of the line before the
+continuation unless another flag is
+used. This could either be an additional
+flag or an alternative flag (uppercase
+of the above's.)
 
