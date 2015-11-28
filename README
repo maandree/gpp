@@ -72,7 +72,7 @@ OPTIONS
 		Set the environment variable NAME to hold
 		the value 1.
 
-	-v, --verion
+	-v, --version
 		Print program name and version and exit.
 
 	-c, --copying

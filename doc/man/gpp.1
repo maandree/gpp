@@ -1,0 +1,134 @@
+.TH GPP 1 GPP
+.SH NAME
+gpp - Bash-based preprocessor for anything
+.PP
+gpp: General Preprocessor
+.SH SYNOPSIS
+.BR gpp
+.RI [ OPTION ]...
+.SH DESCRIPTION
+.B gpp
+lets a developer embed directives written in
+.B GNU Bash
+into any text document. These directives are used
+to automate the writting of parts of the document.
+.PP
+The preprocessing directives start with a symbol (or
+text string) specified by the developer. By default
+this symbol is \fB@\fP (at).
+.PP
+Any line starting with \fB@<\fP (where \fB@\fP is
+the selected symbol for preprocessing directives)
+or \fB@>\fP, or is between a line starting with
+\fB@<\fP and a line starting with \fB@>\fP, is parsed
+as a line, written in
+.BR bash (1),
+that is executed during preprocessing. A \fB@<\fP
+line must have an associated \fB@>\fP line somewhere
+after it, all lines between them are parsed as
+preprocessing directives. A \fB@>\fP does however
+not need an associated \fB@<\fP line somewhere before
+it, making \fB@>\fP suitable for single line directives.
+.PP
+Preprocessing directives can also be inline. For this,
+use
+.BI @( COMMAND )
+where
+.I COMMAND
+is the
+.BR bash (1)
+code to run. Additionally,
+.B gpp
+supports variable substitution.
+.BI @{ VARIABLE }
+will be replaces by the value if the variable
+(possibility environment variable)
+.IR VARIABLE .
+.B gpp
+supports all modifiers that
+.BR bash (1)
+supports. For example, if you want the value to be
+included but uppercase you can write
+.BR @{ \fIVARIABLE\fP ^^} ,
+or
+.BI @{ VARIABLE ,,}
+for lowercase.
+.PP
+Everything that is not preprocessing directives is
+threaded as
+.BR echo (1):ed
+lines.
+.SH OPTIONS
+.TP
+.BR \-s ,\  \-\-symbol \ \fISYMBOL\fP
+Set the prefix symbol for preprocessor directives.
+Defaults to @ (at).
+.TP
+.BR \-e ,\  \-\-encoding \ \fIENCODING\fP
+Specifies the encoding of the file.
+.TP
+.BR \-n ,\  \-\-iterations \ \fIN\fP
+The the processing \fIN\fP times. Defaults to 1 time.
+.TP
+.BR \-u ,\  \-\-unshebang
+Clear the shebang line, remove it if this flag
+is used twice. If used twice, an empty line
+will be inserted after the new first line.
+.TP
+.BR \-i ,\  \-\-input \ \fIFILE\fP
+Select file to process. Defaults to /dev/stdin.
+.TP
+.BR \-o ,\  \-\-output \ \fIFILE\fP
+Select output file. Defaults to /dev/stdout.
+.TP
+.BR \-f ,\  \-\-file \ \fIFILE\fP
+Equivalent to \-i \fIFILE\fP \-o \fIFILE\fP.
+.TP
+.BR \-D ,\  \-\-export \ \fINAME\fP=\fIVALUE\fP
+Set the environment variable \fINAME\fP to hold
+the value \fIVALUE\fP.
+.TP
+.BR \-D ,\  \-\-export \ \fINAME\fP
+Set the environment variable \fINAME\fP to hold
+the value 1.
+.TP
+.BR \-v ,\  \-\-version
+Print program name and version and exit.
+.TP
+.BR \-c ,\  \-\-copying
+Print copyright notice and exit.
+.PP
+Short options must be joined. The value of a flag must
+be in a separate argument from the flag itself.
+.SH RATIONALE
+Programmers need more automation when we write software
+and documentation. An unrestricted preprocessor lets
+you automate just about anything. Of course, it can be
+used for anything, must just writing software and
+documentation. Preprocessing can be used for more than
+automation, it can also be used to increase the flexibility
+of the work.
+.PP
+C is one of the few languages that includes a preprocessor,
+some times it is not enough; and all languages need
+preprocessors.
+.SH "SEE ALSO"
+.BR bash (1),
+.BR jpp (1),
+.BR cpp (1)
+.PP
+Full documentation available locally via: info \(aq(gpp)\(aq
+.SH AUTHORS
+Principal author, Mattias Andrée.  See the COPYING file for the full
+list of authors.
+.SH LICENSE
+Copyright \(co 2013, 2014, 2015  Mattias Andrée
+.br
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.
+.br
+This is free software: you are free to change and redistribute it.
+.br
+There is NO WARRANTY, to the extent permitted by law.
+.SH BUGS
+Please report bugs to https://github.com/maandree/passcheck/issues or to
+maandree@member.fsf.org

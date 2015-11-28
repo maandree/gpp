@@ -81,7 +81,7 @@ obj/fdl.texinfo: doc/info/fdl.texinfo
 
 
 .PHONY: install
-install: install-core install-info
+install: install-core install-info install-man
 
 .PHONY: install
 install-all: install-core install-doc
@@ -100,7 +100,7 @@ install-license:
 	install -m644 COPYING LICENSE -- "$(DESTDIR)$(LICENSEDIR)/$(PKGNAME)"
 
 .PHONY: install-doc
-install-doc: install-info install-pdf install-dvi install-ps
+install-doc: install-info install-pdf install-dvi install-ps install-man
 
 .PHONY: install-info
 install-info: bin/gpp.info
@@ -110,17 +110,22 @@ install-info: bin/gpp.info
 .PHONY: install-pdf
 install-pdf: bin/gpp.pdf
 	install -dm755 -- "$(DESTDIR)$(DOCDIR)"
-	install -m644 -- "$<" "$(DESTDIR)$(DOCDIR)/$(PKGNAME).pdf"
+	install -m644 $< -- "$(DESTDIR)$(DOCDIR)/$(PKGNAME).pdf"
 
 .PHONY: install-dvi
 install-dvi: bin/gpp.dvi
 	install -dm755 -- "$(DESTDIR)$(DOCDIR)"
-	install -m644 -- "$<" "$(DESTDIR)$(DOCDIR)/$(PKGNAME).dvi"
+	install -m644 $< -- "$(DESTDIR)$(DOCDIR)/$(PKGNAME).dvi"
 
 .PHONY: install-ps
 install-ps: bin/gpp.ps
 	install -dm755 -- "$(DESTDIR)$(DOCDIR)"
-	install -m644 -- "$<" "$(DESTDIR)$(DOCDIR)/$(PKGNAME).ps"
+	install -m644 $< -- "$(DESTDIR)$(DOCDIR)/$(PKGNAME).ps"
+
+.PHONY: install-man
+install-man: doc/man/gpp.1
+	install -dm755 -- "$(DESTDIR)$(MAN1DIR)"
+	install -m644 $< -- "$(DESTDIR)$(MAN1DIR)/$(COMMAND).1"
 
 
 
@@ -134,6 +139,7 @@ uninstall:
 	-rm -- "$(DESTDIR)$(DOCDIR)/$(PKGNAME).pdf"
 	-rm -- "$(DESTDIR)$(DOCDIR)/$(PKGNAME).dvi"
 	-rm -- "$(DESTDIR)$(DOCDIR)/$(PKGNAME).ps"
+	-rm -- "$(DESTDIR)$(MAN1DIR)/$(COMMAND).1"
 
 
 
