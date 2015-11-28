@@ -48,7 +48,7 @@ OPTIONS
 		Specifies the encoding of the file.
 
 	-n, --iterations N
-		The the processing N times. Defaults to 1 time.
+		Process the file recursively N times. Defaults to 1 time.
 
 	-u, --unshebang
 		Clear the shebang line, remove it if this flag

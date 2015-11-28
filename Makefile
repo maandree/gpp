@@ -24,10 +24,10 @@ SHEBANG = /usr$(BIN)/env $(PY)
 
 
 .PHONY: default
-default: cmd info
+default: cmd info shell
 
 .PHONY: all
-all: cmd doc
+all: cmd doc shell
 
 .PHONY: cmd
 cmd: bin/gpp
@@ -78,13 +78,34 @@ obj/fdl.texinfo: doc/info/fdl.texinfo
 	@mkdir -p obj
 	cp "$<" "$@"
 
+.PHONY: shell
+shell: bash fish zsh
+
+.PHONY: bash
+bash: bin/gpp.bash-completion
+
+.PHONY: fish
+fish: bin/gpp.fish-completion
+
+.PHONY: zsh
+zsh: bin/gpp.zsh-completion
+
+obj/gpp.auto-completion: src/gpp.auto-completion bin/gpp
+	@mkdir -p obj
+	cp $< $@
+	$(PY) bin/gpp -s '#' -D GPP=$(COMMAND) < "$<" > "$@"
+
+bin/gpp.%sh-completion: obj/gpp.auto-completion
+	@mkdir -p bin
+	auto-auto-complete $*sh --output $@ --source $<
+
 
 
 .PHONY: install
-install: install-core install-info install-man
+install: install-core install-info install-man install-shell
 
 .PHONY: install
-install-all: install-core install-doc
+install-all: install-core install-doc install-shell
 
 .PHONY: install-core
 install-core: install-cmd install-license
@@ -127,6 +148,24 @@ install-man: doc/man/gpp.1
 	install -dm755 -- "$(DESTDIR)$(MAN1DIR)"
 	install -m644 $< -- "$(DESTDIR)$(MAN1DIR)/$(COMMAND).1"
 
+.PHONY: install-shell
+install-shell: install-bash install-fish install-zsh
+
+.PHONY: install-bash
+install-bash: bin/gpp.bash-completion
+	install -dm755 -- "$(DESTDIR)$(DATADIR)/bash-completion/completions"
+	install -m644 $< -- "$(DESTDIR)$(DATADIR)/bash-completion/completions/$(COMMAND)"
+
+.PHONY: install-fish
+install-fish: bin/gpp.fish-completion
+	install -dm755 -- "$(DESTDIR)$(DATADIR)/fish/completions"
+	install -m644 $< -- "$(DESTDIR)$(DATADIR)/fish/completions/$(COMMAND).fish"
+
+.PHONY: install-zsh
+install-zsh: bin/gpp.zsh-completion
+	install -dm755 -- "$(DESTDIR)$(DATADIR)/zsh/site-functions"
+	install -m644 $< -- "$(DESTDIR)$(DATADIR)/zsh/site-functions/_$(COMMAND)"
+
 
 
 .PHONY: uninstall
@@ -140,6 +179,9 @@ uninstall:
 	-rm -- "$(DESTDIR)$(DOCDIR)/$(PKGNAME).dvi"
 	-rm -- "$(DESTDIR)$(DOCDIR)/$(PKGNAME).ps"
 	-rm -- "$(DESTDIR)$(MAN1DIR)/$(COMMAND).1"
+	-rm -- "$(DESTDIR)$(DATADIR)/bash-completion/completions/$(COMMAND)"
+	-rm -- "$(DESTDIR)$(DATADIR)/fish/completions/$(COMMAND).fish"
+	-rm -- "$(DESTDIR)$(DATADIR)/zsh/site-functions/_$(COMMAND)"
 
 
 
