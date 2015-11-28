@@ -110,7 +110,7 @@ Set the prefix symbol for preprocessor directives. (Default: @@)
 
 @item -e
 @itemx --encoding
-Set the encoding of file. (Default: UTF-8)
+Set the encoding of file.
 
 @item -n
 @itemx --iterations
@@ -119,8 +119,8 @@ Number of iterations to run the preprocessing in. (Default: 1)
 @item -u
 @itemx --unshebang
 Blank out the shebang line. Notice that the line is not removed,
-it is just cleared. You can use a shebang line make gpp preprocess
-the file when executed.
+it is just cleared. You can use a shebang line make to gpp
+preprocess the file when executed.
 
 If @option{--unshebang} is used twice, the second line in the
 file will be moved up to the top of the file and the initial
@@ -228,10 +228,20 @@ logged in as `twilight'
 Your are logged in as @@@{USER@}.
 @end example
 
+@noindent
 will after preprocessing say
 
 @example
 Your are logged in as twilight.
+@end example
+
+@noindent
+@command{gpp} supports all modifications to the
+result that Bash does. For example, if you want
+the value to be uppercased you can write
+
+@example
+Your are logged in as @@@{USER^^@}.
 @end example
 
 

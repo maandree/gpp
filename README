@@ -1,4 +1,101 @@
-General Perprocessor
+NAME
+	gpp - Bash-based preprocessor for anything
 
-Bash-based preprocessor for anything.
+	gpp: General Preprocessor
+
+SYNOPSIS
+	gpp [OPTION]...
+
+DESCRIPTION
+	gpp lets a developer embed directives written in GNU
+	Bash into any text document. These directives are used
+	to automate the writting of parts of the document.
+
+	The preprocessing directives start with a symbol
+	(or text string) specified by the developer. By default
+	this symbol is @ (at).
+
+	Any line starting with @< (where @ is the selected
+	symbol for preprocessing directives) or @>, or is
+	between a line starting with @< and a line starting
+	with @>, is parsed as a line, written in Bash, that
+	is executed during preprocessing.
+	A @< line must have an associated @> line somewhere
+	after it, all lines between them are parsed as
+	preprocessing directives. A @> does however not need
+	an associated @< line somewhere before it, making
+	@> suitable for single line directives.
+
+	Preprocessing directives can also be inline. For this,
+	use @(COMMAND) where COMMAND is the Bash code to run.
+	Additionally, gpp supports variable substitution.
+	@{VARIABLE} will be replaces by the value if the
+	variable (possibility environment variable) VARIABLE.
+	gpp supports all modifiers thats Bash supports. For
+	example, if you want the value to be included but
+	uppercase you can write @{VARIABLE^^}, or @{VARIABLE,,}
+	for lowercase.
+
+	Everything that is not preprocessing directives is
+	threaded as echo(1):ed lines.
+
+OPTIONS
+	-s, --symbol SYMBOL
+		Set the prefix symbol for preprocessor directives.
+		Defaults to @.
+
+	-e, --encoding ENCODING
+		Specifies the encoding of the file.
+
+	-n, --iterations N
+		The the processing N times. Defaults to 1 time.
+
+	-u, --unshebang
+		Clear the shebang line, remove it if this flag
+		is used twice. If used twice, an empty line
+		will be inserted after the new first line.
+
+	-i, --input FILE
+		Select file to process. Defaults to /dev/stdin.
+
+	-o, --output FILE
+		Select output file. Defaults to /dev/stdout.
+
+	-f, --file FILE
+		Equivalent to -i FILE -o FILE.
+
+	-D, --export NAME=VALUE
+		Set the environment variable NAME to hold
+		the value VALUE.
+
+	-D, --export NAME
+		Set the environment variable NAME to hold
+		the value 1.
+
+	-v, --verion
+		Print program name and version and exit.
+
+	-c, --copying
+		Print copyright notice and exit.
+
+	Short options must joined. The value of a flag must be
+	in a separate argument from the flag itself.
+
+RATIONALE
+	Programmers need more automation when we write software
+	and documentation. An unrestricted preprocessor lets
+	you automate just about anything. Of course, it can be
+	used for anything, must just writing software and
+	documentation. Preprocessing can be used for more than
+	automation, it can also be used to increase the flexibility
+	of the work.
+
+	C is one of the few languages that includes a preprocessor,
+	some times it is not enough; and all languages need
+	preprocessors.
+
+SEE ALSO
+	bash(1), jpp(1), cpp(1)
+
+	Full documentation available locally via: info '(gpp)'
 
