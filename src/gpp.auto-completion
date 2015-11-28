@@ -1,33 +1,33 @@
 (#{GPP}
-	(argumented (option -s --symbol) (complete --symbol) (arg SYMBOL) (files -0)
+	(argumented (options -s --symbol) (complete --symbol) (arg SYMBOL) (files -0)
 	(desc 'Set the prefix symbol for preprocessor directives'))
 
-	(argumented (option -e --encoding) (complete --encoding) (arg ENCODING) (files -0) (suggest encoding)
+	(argumented (options -e --encoding) (complete --encoding) (arg ENCODING) (files -0) (suggest encoding)
 	(desc 'Select encoding of the file'))
 	(suggestion encoding (verbatim UTF-8))
 
-	(argumented (option -n --iterations) (complete --iterations) (arg N) (files -0)
+	(argumented (options -n --iterations) (complete --iterations) (arg N) (files -0)
 	(desc 'Select the number of times to perform the preprocessing recursively'))
 
-	(unargumented (option -u --unshebang) (complete --unshebang)
+	(unargumented (options -u --unshebang) (complete --unshebang)
 	(desc 'Clear the shebang line, twice to delete it'))
 
-	(argumented (option -i --input) (complete --input) (arg FILE) (files -f)
+	(argumented (options -i --input) (complete --input) (arg FILE) (files -f)
 	(desc 'Select file to process'))
 
-	(argumented (option -i --output) (complete --output) (arg FILE) (files -f)
+	(argumented (options -i --output) (complete --output) (arg FILE) (files -f)
 	(desc 'Select output file'))
 
-	(argumented (option -f --file) (complete --file) (arg FILE) (files -r)
+	(argumented (options -f --file) (complete --file) (arg FILE) (files -r)
 	(desc 'Select file to both process and store the output'))
 
-	(argumented (option -D --export) (complete --export) (arg NAME=VALUE) (files -0)
+	(argumented (options -D --export) (complete --export) (arg NAME=VALUE) (files -0)
 	(desc 'Set environment variable'))
 
-	(unargumented (option -v --version) (complete --version)
+	(unargumented (options -v --version) (complete --version)
 	(desc 'Print program name and version and exit'))
 
-	(unargumented (option -c --copying) (complete --copying)
+	(unargumented (options -c --copying) (complete --copying)
 	(desc 'Print copyright notice and exit'))
 )
 
