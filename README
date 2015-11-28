@@ -78,8 +78,8 @@ OPTIONS
 	-c, --copying
 		Print copyright notice and exit.
 
-	Short options must joined. The value of a flag must be
-	in a separate argument from the flag itself.
+	Short options must be joined. The value of a flag must
+	be in a separate argument from the flag itself.
 
 RATIONALE
 	Programmers need more automation when we write software
