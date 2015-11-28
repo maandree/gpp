@@ -95,7 +95,7 @@ RATIONALE
 	preprocessors.
 
 SEE ALSO
-	bash(1), jpp(1), cpp(1)
+	bash(1), jpp(1), cpp(1), env(1)
 
 	Full documentation available locally via: info '(gpp)'
 
