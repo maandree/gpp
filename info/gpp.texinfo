@@ -73,7 +73,7 @@ directive.
 
 A file written with gpp contains, text that
 can be in any format, gpp does not care how
-it is formated, and lines written in GNU Bash
+it is formatted, and lines written in GNU Bash
 that are executed and termine which part of
 the text should be keept and how it should
 be repeated. A line can also be partially
