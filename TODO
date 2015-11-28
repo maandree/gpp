@@ -1,0 +1,10 @@
+This should only used when necessary when
+when a specific flag is used.
+  Before all lines, add 10ⁿ−1 empty lines
+  where n is as small as possible to retain
+  as line numbers but with a constant
+  multiple.
+  Then add m10ᷜ number of empty lines
+  at the top of the file, where k is large
+  and n is the number specified above.
+
