@@ -2,9 +2,6 @@ _/
 /bin/
 /obj/
 __pycache__/
-/dist/*/*/*
-!/dist/*/*/PKGBUILD
-!/dist/*/*/*.install
 .*
 !.git*
 \#*\#
