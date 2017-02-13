@@ -3,7 +3,7 @@
 copyright = '''
 gpp – Bash-based general-purpose preprocessor
 
-Copyright © 2013, 2014, 2015  Mattias Andrée (maandree@member.fsf.org)
+Copyright © 2013, 2014, 2015, 2017  Mattias Andrée (maandree@member.fsf.org)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -93,7 +93,7 @@ if iterations < 1:
         data = None
         with open(input_file, 'rb') as file:
             data = file.read()
-        with open(write_file, 'wb') as file:
+        with open(output_file, 'wb') as file:
             file.write(data)
             file.flush()
     sys.exit(0)
@@ -178,6 +178,11 @@ def pp(line):
             elif c == ord('\\'):
                 esc = True
             rc.append(c)
+        elif line[i - 1 : i + symlen - 1] == symbol:
+            if symb:
+                rc += symbol
+            symb = not symb
+            i += symlen - 1
         elif symb:
             symb = False
             if c in (ord('('), ord('{')):
@@ -192,9 +197,6 @@ def pp(line):
                 rc.append(ord('\\'))
                 rc.append(c)
             rc.append(c)
-        elif line[i - 1 : i + symlen - 1] == symbol:
-            symb = True
-            i += symlen - 1
         elif c == ord('\''):
             rc.append(c)
             rc.append(ord('\\'))
