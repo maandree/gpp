@@ -177,6 +177,58 @@ the code will expand to
 You are logged in as @{USER^}.
 .fi
 
+.SS Include paths
+This example lets the user define a colon-separated
+list of paths, in the
+.B INCLUDEPATH
+environment variable, in which to look for files to
+either include directly into the source that is being
+preprocessed, using the
+.BR include_verbatim ()
+function, directly into the preprocessor, using the
+.BR include ()
+function, or into the source that is being processed
+but after preprocessing it with
+.BR gpp ,
+using the
+.BR include_verbatim ()
+and piping it into
+.BR gpp .
+.PP
+.nf
+locate () (
+	IFS=:
+	for d in $INCLUDEPATH; do
+		if [ -f \(dq$d/$1\(dq ]; then
+			printf \(aq%s\en\(aq \(dq$d/$1\(dq
+			exit 0
+		fi
+	done
+	printf \(aqCannot locate %s\en\(aq \(dq$1\(dq >&2
+	exit 1
+)
+
+includex () {
+	local method
+	local file
+	set -e
+	method=\(dq$1\(dq
+	file=\(dq$2\(dq
+	test -n \(dq$method\(dq
+	test -n \(dq$file\(dq
+	shift 2
+	$method -- \(dq$(locate \(dq$file\(dq)\(dq \(dq$@\(dq
+}
+
+include () {
+	locatex . \(dq$@\(dq
+}
+
+include_verbatim () {
+	locatex cat \(dq$@\(dq
+}
+.fi
+
 .SH RATIONALE
 Programmers need more automation when we write software
 and documentation. An unrestricted preprocessor lets
