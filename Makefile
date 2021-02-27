@@ -7,13 +7,13 @@ PKGNAME = gpp
 COMMAND = gpp
 
 PY = python
-SHEBANG = /usr$(BIN)/env $(PY)
+SHEBANG = /usr/bin/env $(PY)
 
 
 all: gpp
 
 gpp: gpp.py
-	env VERSION='$(VERSION)' SHEBANG='$(SHEBANG)' $(PY) "$<" < "$<" > "$@"
+	env SHEBANG='$(SHEBANG)' $(PY) gpp.py < gpp.py > $@
 
 install: gpp
 	install -dm755 -- "$(DESTDIR)$(PREFIX)/bin"

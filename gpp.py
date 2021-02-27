@@ -1,24 +1,5 @@
 #!@{SHEBANG}
 # -*- coding: utf-8 -*-
-copyright = '''
-gpp – Bash-based general-purpose preprocessor
-
-Copyright © 2013, 2014, 2015, 2017  Mattias Andrée (maandree@member.fsf.org)
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-'''
-VERSION="@{VERSION}"
 
 import os
 import sys
@@ -72,12 +53,6 @@ for i in range(1, len(args)):
             export += '=1'
         export = (export.split('=')[0], '='.join(export.split('=')[1:]))
         os.putenv(export[0], export[1])
-    elif arg in ('-v', '--version'):
-        print('gpp ' + VERSION)
-        sys.exit(0)
-    elif arg in ('-c', '--copying'):
-        print(copyright[1:-1])
-        sys.exit(0)
     else:
         continue
     i += 1
