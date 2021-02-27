@@ -1,8 +1,12 @@
 /* See LICENSE file for copyright and license details. */
+#include <sys/wait.h>
 #include <ctype.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <limits.h>
+#include <poll.h>
+#include <stdarg.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -87,6 +91,29 @@ xcreate(const char *path)
 }
 
 
+static void
+append(char **restrict out_datap, size_t *restrict out_lenp, size_t *restrict out_sizep, const char *fmt, ...)
+{
+	va_list ap, ap2;
+	size_t len;
+	va_start(ap, fmt);
+	va_copy(ap2, ap);
+	len = (size_t)vsnprintf(NULL, 0, fmt, ap2);
+	va_end(ap2);
+	if (*out_lenp + len + 1 > *out_sizep) {
+		*out_sizep = *out_lenp + len + 1;
+		*out_datap = realloc(*out_datap, *out_sizep);
+		if (!*out_datap) {
+			fprintf(stderr, "%s: realloc: %s\n", argv0, strerror(errno));
+			exit(1);
+		}
+	}
+	vsprintf(&(*out_datap)[*out_lenp], fmt, ap);
+	*out_lenp += len;
+	va_end(ap);
+}
+
+
 int
 main(int argc, char *argv[])
 {
@@ -94,6 +121,7 @@ main(int argc, char *argv[])
 	const char *input_file = NULL;
 	const char *output_file = NULL;
 	const char *symbol = NULL;
+	size_t symlen = 1;
 	int iterations = -1;
 	int unshebang = 0;
 	long int tmp;
@@ -101,8 +129,16 @@ main(int argc, char *argv[])
 	char *in_data = NULL, *out_data = NULL;
 	size_t in_size = 0, in_len = 0, in_off = 0;
 	size_t out_size = 0, out_len = 0, out_off = 0;
-	int in_fd, out_fd, do_close;
+	int in_fd, out_fd, do_close, fds_in[2], fds_out[2];
+	struct pollfd pfds[2];
+	size_t npfds;
+	char buffer[4096], c, *quotes = NULL, quote;
+	size_t brackets, nquotes, quotes_size = 0;
+	int symb, esc, dollar;
+	size_t len, j, lineno, no = 0, cnt;
+	int i, n, status, state, entered;
 	ssize_t r;
+	pid_t pid;
 
 	ARGBEGIN {
 	case 'D':
@@ -154,6 +190,9 @@ main(int argc, char *argv[])
 		if (symbol)
 			usage();
 		symbol = EARGF(usage());
+		symlen = strlen(symbol);
+		if (!symlen)
+			usage();
 		break;
 	case 'u':
 		if (unshebang == 2)
@@ -164,8 +203,11 @@ main(int argc, char *argv[])
 		usage();
 	} ARGEND;
 
-	if (argc)
+	if (argc) {
+		if (!**argv)
+			usage();
 		shell = (void *)argv;
+	}
 
 	if (setenv("_GPP", argv0, 1))
 		fprintf(stderr, "%s: setenv _GPP %s 1: %s\n", argv0, argv0, strerror(errno));
@@ -217,16 +259,288 @@ main(int argc, char *argv[])
 after_unshebang:
 
 	while (iterations--) {
-		/* TODO parse: in -> out */
+		entered = 0;
+		state = 0;
+		lineno = 0;
+		brackets = nquotes = 0;
+		symb = esc = dollar = 0;
+		while (in_off < in_len) {
+			if (state == 2) {
+			preprocess:
+				c = in_data[in_off++];
+				if (c == '\n') {
+					state = 0;
+					brackets = nquotes = 0;
+					symb = esc = dollar = 0;
+					append(&out_data, &out_len, &out_size, "'\n");
+				} else if (brackets) {
+					if (esc) {
+						esc = 0;
+					} else if (nquotes) {
+						if (dollar) {
+							dollar = 0;
+							if (c == '(') {
+								quote = ')';
+								goto add_to_quotes;
+							} else if (c == '{') {
+								quote = '}';
+								goto add_to_quotes;
+							}
+						} else if (c == quotes[nquotes - 1]) {
+							nquotes -= 1;
+						} else if ((quotes[nquotes - 1] == ')' || quotes[nquotes - 1] == '}') &&
+							   (c == '"' || c == '\'' || c == '`')) {
+							quote = c;
+							goto add_to_quotes;
+						} else if (c == '\\' && quotes[nquotes - 1] != '\'') {
+							esc = 1;
+						} else if (c == '$') {
+							dollar = 1;
+						}
+					} else if (c == '"' || c == '\'' || c == '`') {
+						quote = c;
+					add_to_quotes:
+						if (nquotes == quotes_size) {
+							quotes = realloc(quotes, quotes_size += 1);
+							if (!quotes) {
+								fprintf(stderr, "%s: realloc: %s\n", argv0, strerror(errno));
+								return 1;
+							}
+						}
+						quotes[nquotes++] = quote;
+					} else if (c == ')' || c == '}') {
+						if (!--brackets) {
+							append(&out_data, &out_len, &out_size, "%c\"'", c);
+							continue;
+						}
+					} else if (c == '(' || c == '}') {
+						brackets += 1;
+					} else if (c == '\\') {
+						esc = 1;
+					}
+					append(&out_data, &out_len, &out_size, "%c", c);
+				} else if (c == *symbol && in_len - (in_off - 1) >= symlen &&
+					   !memcmp(&in_data[in_off - 1], symbol, symlen)) {
+					if (symb)
+						append(&out_data, &out_len, &out_size, "%s", symbol);
+					symb ^= 1;
+					in_off += symlen - 1;
+				} else if (symb) {
+					symb = 0;
+					if (c == '(' || c == '{') {
+						brackets += 1;
+						append(&out_data, &out_len, &out_size, "'\"$%c", c);
+					} else if (c == '\'') {
+						append(&out_data, &out_len, &out_size, "%s'\\''", symbol);
+					} else {
+						append(&out_data, &out_len, &out_size, "%s%c", symbol, c);
+					}
+				} else if (c == '\'') {
+					append(&out_data, &out_len, &out_size, "'\\''");
+				} else {
+					if (out_len == out_size) {
+						out_data = realloc(out_data, out_size += 4096);
+						if (!out_data) {
+							fprintf(stderr, "%s: realloc: %s\n", argv0, strerror(errno));
+							return 1;
+						}
+					} else {
+						if ((out_data[out_len++] = c) == '\n')
+							state = 0;
+					}
+				}
+			} else if (state == 1) {
+			append_char:
+				if (out_len == out_size) {
+					out_data = realloc(out_data, out_size += 4096);
+					if (!out_data) {
+						fprintf(stderr, "%s: realloc: %s\n", argv0, strerror(errno));
+						return 1;
+					}
+				} else {
+					if ((out_data[out_len++] = in_data[in_off++]) == '\n')
+						state = 0;
+				}
+			} else {
+				lineno += 1;
+				if (in_len - in_off > symlen && !memcmp(&in_data[in_off], symbol, symlen) &&
+				    (in_data[in_off + symlen] == '<' || in_data[in_off + symlen] == '>')) {
+					state = 1;
+					entered = in_data[in_off + symlen] == '<';
+					in_off += symlen + 1;
+				} else if (entered) {
+					goto append_char;
+				} else {
+					append(&out_data, &out_len, &out_size, "printf '\\000%%zu\\000%%s\\n' %zu '", lineno);
+					state = 2;
+					goto preprocess;
+				}
+			}
+		}
+		if (state == 2)
+			append(&out_data, &out_len, &out_size, "'");
 
 		in_len = 0;
 		in_off = 0;
 
-		/* TODO shell: out -> in */
+		if (pipe(fds_in) || pipe(fds_out)) {
+			fprintf(stderr, "%s: pipe: %s\n", argv0, strerror(errno));
+			return 1;
+		}
+		pid = fork();
+		switch (pid) {
+		case -1:
+			fprintf(stderr, "%s: fork: %s\n", argv0, strerror(errno));
+			return 1;
+		case 0:
+			close(fds_in[1]);
+			close(fds_out[0]);
+			if (dup2(fds_in[0], STDIN_FILENO) != STDIN_FILENO) {
+				fprintf(stderr, "%s: dup2 <pipe> STDIN_FILENO: %s\n", argv0, strerror(errno));
+				return 1;
+			}
+			if (dup2(fds_out[1], STDOUT_FILENO) != STDOUT_FILENO) {
+				fprintf(stderr, "%s: dup2 <pipe> STDOUT_FILENO: %s\n", argv0, strerror(errno));
+				return 1;
+			}
+			close(fds_in[0]);
+			close(fds_out[1]);
+			execvp(*shell, (void *)shell);
+			fprintf(stderr, "%s: execvp %s: %s\n", argv0, *shell, strerror(errno));
+			return 1;
+		default:
+			close(fds_in[0]);
+			close(fds_out[1]);
+			break;
+		}
+		pfds[0].fd = fds_in[1];
+		pfds[0].events = POLLOUT;
+		pfds[1].fd = fds_out[0];
+		pfds[1].events = POLLIN;
+		npfds = 2;
+		lineno = 1;
+		state = 0;
+		while (npfds) {
+			n = poll(pfds, npfds, -1);
+			if (n < 0) {
+				fprintf(stderr, "%s: poll: %s\n", argv0, strerror(errno));
+				return 1;
+			}
+			for (i = 0; i < n; i++) {
+				if (!pfds[i].revents)
+					continue;
+				if (pfds[i].fd == fds_in[1]) {
+					if (out_off == out_len) {
+						if (close(fds_in[1])) {
+							fprintf(stderr, "%s: write <pipe>: %s\n", argv0, strerror(errno));
+							return 1;
+						}
+						pfds[i] = pfds[--npfds];
+						continue;
+					}
+					r = write(fds_in[1], &out_data[out_off], out_len - out_off);
+					if (r <= 0) {
+						fprintf(stderr, "%s: write <pipe>: %s\n", argv0, strerror(errno));
+						return 1;
+					}
+					out_off += (size_t)r;
+				} else {
+					r = read(fds_out[0], buffer, sizeof(buffer));
+					if (r <= 0) {
+						if (r < 0 || close(fds_out[0])) {
+							fprintf(stderr, "%s: read <pipe>: %s\n", argv0, strerror(errno));
+							return 1;
+						}
+						pfds[i] = pfds[--npfds];
+						continue;
+					}
+					len = (size_t)r;
+					for (j = 0; j < len; j++) {
+						switch (state) {
+						case 0:
+							no = 0;
+							if (!buffer[j]) {
+								state = 1;
+							} else {
+								state = 3;
+								goto state3;
+							}
+							break;
+						case 1:
+							if (isdigit(buffer[j])) {
+								if (buffer[j] == '0') {
+									append(&in_data, &in_len, &in_size, "%c", 0);
+									state = 3;
+									goto state3;
+								}
+								state = 2;
+							}
+							/* fall through */
+						case 2:
+							if (isdigit(buffer[j])) {
+								if (buffer[j] > (SIZE_MAX - (buffer[j] & 15)) / 10) {
+									append(&in_data, &in_len, &in_size, "%c%zu", 0, no);
+									state = 3;
+									goto state3;
+								}
+								no = no * 10 + (buffer[j] & 15);
+							} else if (!buffer[j]) {
+								if (no > lineno) {
+									cnt = no - lineno;
+									lineno = no;
+									if (in_len + cnt > in_size) {
+										in_size = in_len + cnt;
+										in_data = realloc(in_data, in_size);
+										if (!in_data) {
+											fprintf(stderr, "%s: realloc: %s\n",
+											        argv0, strerror(errno));
+											return 1;
+										}
+									}
+									while (cnt--)
+										in_data[in_len++] = '\n';
+								}
+								state = 3;
+							} else {
+								append(&in_data, &in_len, &in_size, "%c%zu", 0, no);
+								state = 3;
+								goto state3;
+							}
+							break;
+						default:
+						state3:
+							if (in_len == in_size) {
+								in_size += 4096;
+								in_data = realloc(in_data, in_size);
+								if (!in_data) {
+									fprintf(stderr, "%s: realloc: %s\n", argv0, strerror(errno));
+									return 1;
+								}
+							}
+							in_data[in_len++] = buffer[j];
+							if (buffer[j] == '\n') {
+								lineno += 1;
+								state = 0;
+							}
+							break;
+						}
+					}
+				}
+			}
+		}
+		if (waitpid(pid, &status, 0) != pid) {
+			fprintf(stderr, "%s: waitpid %s <&status> 0: %s\n", argv0, *shell, strerror(errno));
+			return 1;
+		}
+		if (status)
+			return WIFEXITED(status) ? WEXITSTATUS(status) : 1;
 
 		out_len = 0;
 		out_off = 0;
+		in_off = 0;
 	}
+
+	free(quotes);
 
 	free(out_data);
 	out_fd = xcreate(output_file);

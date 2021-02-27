@@ -23,12 +23,12 @@ DESCRIPTION
 	symbol for preprocessing directives) or @>, or is
 	between a line starting with @< and a line starting
 	with @>, is parsed as a line, written in Bash, that
-	is executed during preprocessing.
-	A @< line must have an associated @> line somewhere
-	after it, all lines between them are parsed as
-	preprocessing directives. A @> does however not need
-	an associated @< line somewhere before it, making
-	@> suitable for single line directives.
+	is executed during preprocessing. A @< line must have
+	an associated @> line somewhere after it, all lines
+	between them are parsed as preprocessing directives.
+	A @> does however not need an associated @< line
+	somewhere before it, making @> suitable for single
+	line directives.
 
 	Preprocessing directives can also be inline. For this,
 	use @(COMMAND) where COMMAND is the Bash code to run.
@@ -41,7 +41,7 @@ DESCRIPTION
 	for lowercase.
 
 	Everything that is not a preprocessing directive is
-	echo verbatim.
+	echo verbatim, except all @@ are replaced by @.
 
 OPTIONS
 	-D name=value
