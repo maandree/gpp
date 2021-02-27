@@ -1,10 +1,11 @@
 NAME
 	gpp - Bash-based preprocessor for anything
 
-	gpp: General Preprocessor
-
 SYNOPSIS
 	gpp [OPTION]...
+
+ETYMOLOGY
+	gpp stands for General Preprocessor.
 
 DESCRIPTION
 	gpp lets a developer embed directives written in GNU
@@ -36,8 +37,8 @@ DESCRIPTION
 	uppercase you can write @{VARIABLE^^}, or @{VARIABLE,,}
 	for lowercase.
 
-	Everything that is not preprocessing directives is
-	threaded as echo(1):ed lines.
+	Everything that is not a preprocessing directive is
+	echo verbatim.
 
 OPTIONS
 	-s, --symbol SYMBOL
@@ -81,6 +82,48 @@ OPTIONS
 	Short options must be joined. The value of a flag must
 	be in a separate argument from the flag itself.
 
+EXAMPLES
+    Conditional hello world
+	This example only includes the "Hello world" line if
+	the environment variable HELLO is defined and is not
+	empty.
+
+	@>if [ -z "$HELLO" ]; the
+	Hello world
+	@>fi
+
+    Mutliline preprocessor directive
+	This example creates the function uppercase() that
+	convert lower case ASCII leters to uper case.
+
+	@<uppercase () {
+	     lower=qwertyuiopasdfghjklzxcvbnm
+	     upper=QWERTYUIOPASDFGHJKLZXCVBNM
+	     sed y/$lower/$upper/ <<<"$*"
+	@>}
+
+    Inline directives
+	This example uses the uppercase() function above to
+	convert the user's username to upper case. If the user's
+	username is john, the code will expand to You are logged
+	in as JOHN.
+
+	You are logged in as @(uppercase $USER).
+
+    Variable expansions
+	In this example, if the user's username john, the code
+	will expand to You are logged in as john.
+
+	You are logged in as @{USER}.
+
+    Variable expansion with substitution
+	This example uses a substitution mechanism in Bash to
+	convert the first letter in a variable to upper case.
+	In this example, if the user's username john, the code
+	will expand to You are logged in as John.
+
+	You are logged in as @{USER^}.
+
 RATIONALE
 	Programmers need more automation when we write software
 	and documentation. An unrestricted preprocessor lets
@@ -96,6 +139,3 @@ RATIONALE
 
 SEE ALSO
 	bash(1), jpp(1), cpp(1), env(1)
-
-	Full documentation available locally via: info '(gpp)'
-

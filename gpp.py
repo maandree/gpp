@@ -253,4 +253,3 @@ data = bytes(linejoin(data))
 with open(output_file, 'wb') as file:
     file.write(data)
     file.flush()
-

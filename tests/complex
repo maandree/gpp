@@ -4,4 +4,3 @@
 
 '@{h}ello @(echo `echo 'W'`"o$(echo $(echo r))"'ld!')'
 @('$()$()')
-
