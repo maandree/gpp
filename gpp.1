@@ -4,17 +4,31 @@ gpp - Bash-based preprocessor for anything
 
 .SH SYNOPSIS
 .R gpp
-.RI [ OPTION ]...
+[-D
+.IR name [= value ]]
+[-f
+.I file
+| [-i
+.IR input-file ]
+[-o
+.IR output-file ]]
+[-n
+.IR count ]
+[-s
+.IR symbol ]
+[-u [-u]]
+.RI [ shell
+.RI [ argument ]\ ...]
 
 .SH ETYMOLOGY
 gpp stands for General Preprocessor.
 
 .SH DESCRIPTION
 .B gpp
-lets a developer embed directives written in
-.B GNU Bash
-into any text document. These directives are used
-to automate the writting of parts of the document.
+lets a developer embed directives written in GNU Bash
+(this can be changed) into any text document. These
+directives are used to automate the writting of parts
+of the document.
 .PP
 The preprocessing directives start with a symbol (or
 text string) specified by the developer. By default
@@ -23,7 +37,8 @@ this symbol is
 (at).
 .PP
 Any line starting with 
-.B @< (where
+.B @<
+(where
 .B @
 is the selected symbol for preprocessing directives) or
 .BR @> ,
@@ -73,41 +88,120 @@ Everything that is not a preprocessing directive is
 echo verbatim.
 
 .SH OPTIONS
+The
+.B gpp
+utility conforms to the Base Definitions volume of POSIX.1-2017,
+.IR "Section 12.2" ,
+.IR "Utility Syntax Guidelines" .
+.PP
+The following option is supported:
 .TP
-.BR \-s ,\  \-\-symbol \ \fISYMBOL\fP
+.BR \-D\  \fIname\fP\fB=\fP\fIvalue\fP
+Set the environment variable \fIname\fP to hold
+the value \fIvalue\fP.
+.TP
+.BR \-D\  \fIname\fP
+Set the environment variable \fIname\fP to hold
+the value 1.
+.TP
+.BI \-f\  file
+Equivalent to \-i
+.I file
+\-o
+.IR file .
+.TP
+.BI \-i\  input-file
+Select file to process. If
+.B -
+is specified, /dev/stdin will be used.
+Default value is /dev/stdin.
+.TP
+.BI \-n\  n
+Process the file recursively
+.I n
+times. Default value is 1.
+.TP
+.BI \-o\  output-file
+Select output file. If
+.B -
+is specified, /dev/stdout will be used.
+Default value is /dev/stdout.
+.TP
+.BI \-s\  symbol
 Set the prefix symbol for preprocessor directives.
-Defaults to @ (at).
+Default value is
+.BR @ .
 .TP
-.BR \-e ,\  \-\-encoding \ \fIENCODING\fP
-Specifies the encoding of the file.
-.TP
-.BR \-n ,\  \-\-iterations \ \fIN\fP
-Process the file recursively \fIN\fP times. Defaults to 1 time.
-.TP
-.BR \-u ,\  \-\-unshebang
+.B \-u
 Clear the shebang line, remove it if this flag
 is used twice. If used twice, an empty line
 will be inserted after the new first line.
+
+.SH OPERANDS
+The following operands are supported:
 .TP
-.BR \-i ,\  \-\-input \ \fIFILE\fP
-Select file to process. Defaults to /dev/stdin.
+.I shell
+The shell to run instead of
+.BR bash .
+The
+.I shell
+must be compatible with POSIX shell.
 .TP
-.BR \-o ,\  \-\-output \ \fIFILE\fP
-Select output file. Defaults to /dev/stdout.
+.IR argument \ ...
+Command line arguments for the shell.
+
+.SH STDIN
+The
+.B gpp
+utility does not use the standard input.
+
+.SH INPUT FILES
+The input file may be of any type, except it may not be a directory.
+
+.SH ENVIRONMENT VARIABLES
+The following environment variables affects the execution of
+.BR gpp :
 .TP
-.BR \-f ,\  \-\-file \ \fIFILE\fP
-Equivalent to \-i \fIFILE\fP \-o \fIFILE\fP.
-.TP
-.BR \-D ,\  \-\-export \ \fINAME\fP=\fIVALUE\fP
-Set the environment variable \fINAME\fP to hold
-the value \fIVALUE\fP.
-.TP
-.BR \-D ,\  \-\-export \ \fINAME\fP
-Set the environment variable \fINAME\fP to hold
-the value 1.
+.B PATH
+Default. See to the Base Definitions volume of POSIX.1-2017, Section 8.3, Other Environment Variables.
 .PP
-Short options must be joined. The value of a flag must
-be in a separate argument from the flag itself.
+.B gpp
+will set the environment variable
+.B _GPP
+to the zeroth argument
+.B gpp
+was execute with (the name of the command or path to the command).
+
+.SH ASYNCHRONOUS EVENTS
+Default.
+
+.SH STDOUT
+The
+.B gpp
+utility does not use the standard output.
+
+.SH STDERR
+The standard error is only used for diagnostic messages.
+
+.SH OUTPUT FILES
+The output file may be of any type, except it may not be a directory.
+
+.SH EXTENDED DESCRIPTION
+None.
+
+.SH EXIT STATUS
+.TP
+0
+Successful completion.
+.TP
+1
+An error occurred.
+
+.SH CONSEQUENCES OF ERRORS
+Default.
+
+.SH APPLICATION USAGE
+None.
 
 .SH EXAMPLES
 .SS Conditional hello world
@@ -236,7 +330,16 @@ C is one of the few languages that includes a preprocessor,
 some times it is not enough; and all languages need
 preprocessors.
 
-.SH "SEE ALSO"
+.SH NOTES
+None.
+
+.SH BUS
+None.
+
+.SH FUTURE DIRECTIONS
+None.
+
+.SH SEE ALSO
 .BR bash (1),
 .BR jpp (1),
 .BR cpp (1),

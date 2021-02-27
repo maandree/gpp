@@ -2,15 +2,18 @@ NAME
 	gpp - Bash-based preprocessor for anything
 
 SYNOPSIS
-	gpp [OPTION]...
+	gpp [-D name[=value]] [-f file | [-i input-file]
+	    [-o output-file]] [-n count] [-s symbol] [-u [-u]]
+	    [shell [argument] ...]
 
 ETYMOLOGY
 	gpp stands for General Preprocessor.
 
 DESCRIPTION
 	gpp lets a developer embed directives written in GNU
-	Bash into any text document. These directives are used
-	to automate the writting of parts of the document.
+	Bash (this can be changed) into any text document.
+	These directives are used to automate the writting of
+	parts of the document.
 
 	The preprocessing directives start with a symbol
 	(or text string) specified by the developer. By default
@@ -41,40 +44,43 @@ DESCRIPTION
 	echo verbatim.
 
 OPTIONS
-	-s, --symbol SYMBOL
+	-D name=value
+		Set the environment variable name to hold
+		the value value.
+
+	-D name
+		Set the environment variable name to hold
+		the value 1.
+
+	-f file
+		Equivalent to -i FILE -o FILE.
+
+	-i input-file
+		Select file to process. Defaults to /dev/stdin.
+
+	-n count
+		Process the file recursively count times.
+		Defaults to 1 time.
+
+	-o output-file
+		Select output file. Defaults to /dev/stdout.
+
+	-s symbol
 		Set the prefix symbol for preprocessor directives.
 		Defaults to @.
 
-	-e, --encoding ENCODING
-		Specifies the encoding of the file.
-
-	-n, --iterations N
-		Process the file recursively N times. Defaults to 1 time.
-
-	-u, --unshebang
+	-u
 		Clear the shebang line, remove it if this flag
 		is used twice. If used twice, an empty line
 		will be inserted after the new first line.
 
-	-i, --input FILE
-		Select file to process. Defaults to /dev/stdin.
+OPERANDS
+	shell
+		The shell to run instead of bash. The shell
+		must be compatible with POSIX shell.
 
-	-o, --output FILE
-		Select output file. Defaults to /dev/stdout.
-
-	-f, --file FILE
-		Equivalent to -i FILE -o FILE.
-
-	-D, --export NAME=VALUE
-		Set the environment variable NAME to hold
-		the value VALUE.
-
-	-D, --export NAME
-		Set the environment variable NAME to hold
-		the value 1.
-
-	Short options must be joined. The value of a flag must
-	be in a separate argument from the flag itself.
+	argument ...
+		Command line arguments for the shell.
 
 EXAMPLES
     Conditional hello world
