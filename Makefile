@@ -14,10 +14,10 @@ gpp: gpp.o
 	$(CC) -c -o $@ $< $(CFLAGS) $(CPPFLAGS)
 
 install: gpp
-	install -dm755 -- "$(DESTDIR)$(PREFIX)/bin"
-	install -m755 -- gpp "$(DESTDIR)$(PREFIX)/bin/gpp"
-	install -dm755 -- "$(DESTDIR)$(MANPREFIX)/man"
-	install -m644 -- gpp.1 "$(DESTDIR)$(MANPREFIX)/man/gpp.1"
+	mkdir -p -- "$(DESTDIR)$(PREFIX)/bin"
+	mkdir -p -- "$(DESTDIR)$(MANPREFIX)/man"
+	cp -- gpp "$(DESTDIR)$(PREFIX)/bin/gpp"
+	cp -- gpp.1 "$(DESTDIR)$(MANPREFIX)/man/gpp.1"
 
 uninstall:
 	-rm -- "$(DESTDIR)$(PREFIX)/bin/gpp"
