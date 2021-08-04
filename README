@@ -3,7 +3,8 @@ NAME
 
 SYNOPSIS
 	gpp [-D name[=value]] [-f file | [-i input-file]
-	    [-o output-file]] [-n count] [-s symbol] [-u [-u]]
+	    [-o output-file]] [-n count] [-s symbol]
+	    [-R macroline-replacement-text] [-u [-u]]
 	    [shell [argument] ...]
 
 ETYMOLOGY
@@ -35,10 +36,13 @@ DESCRIPTION
 	Additionally, gpp supports variable substitution.
 	@{VARIABLE} will be replaces by the value if the
 	variable (possibility environment variable) VARIABLE.
-	gpp supports all modifiers thats Bash supports. For
-	example, if you want the value to be included but
-	uppercase you can write @{VARIABLE^^}, or @{VARIABLE,,}
-	for lowercase.
+	gpp supports all modifiers thats Bash (or which ever
+	shell is selected) supports. For example, if you want
+	the value to be included but uppercase you can write
+	@{VARIABLE^^}, or @{VARIABLE,,} for lowercase. gpp
+	also supports mathematical expressions that the via
+	the shells $((EXPRESSION)) syntax, by using
+	@((EXPRESSION)).
 
 	Everything that is not a preprocessing directive is
 	echo verbatim, except all @@ are replaced by @.
@@ -56,18 +60,23 @@ OPTIONS
 		Equivalent to -i FILE -o FILE.
 
 	-i input-file
-		Select file to process. Defaults to /dev/stdin.
+		Select file to process. Default value is /dev/stdin.
 
 	-n count
 		Process the file recursively count times.
-		Defaults to 1 time.
+		Default value is 1.
 
 	-o output-file
-		Select output file. Defaults to /dev/stdout.
+		Select output file. Defaults value is /dev/stdout.
+
+	-R macroline-replacement-text
+		Text to replace macrolines with in the output.
+		You may for example want to use % for TeX files.
+		Default value is the empty string.
 
 	-s symbol
 		Set the prefix symbol for preprocessor directives.
-		Defaults to @.
+		Default value is @.
 
 	-u
 		Clear the shebang line, remove it if this flag

@@ -14,6 +14,8 @@ gpp - Bash-based preprocessor for anything
 .IR output-file ]]
 [-n
 .IR count ]
+[-R
+.IR macroline-replacement-text ]
 [-s
 .IR symbol ]
 [-u [-u]]
@@ -77,12 +79,20 @@ will be replaces by the value if the variable
 .B gpp
 supports all modifiers that
 .BR bash (1)
-supports. For example, if you want the value to be
-included but uppercase you can write
+(or which ever
+.I shell
+is selected) supports. For example, if you want the
+value to be included but uppercase you can write
 .BR @{ \fIVARIABLE\fP ^^} ,
 or
 .BI @{ VARIABLE ,,}
 for lowercase.
+.B gpp
+also supports mathematical expressions that the via
+the shells
+.BI $(( EXPRESSION ))
+syntax, by using
+.BR @(( \fIEXPRESSION\fP )) .
 .PP
 Everything that is not a preprocessing directive is
 echo verbatim, except all
@@ -129,6 +139,13 @@ Select output file. If
 .B -
 is specified, /dev/stdout will be used.
 Default value is /dev/stdout.
+.TP
+.BI \-R\  macroline-replacement-text
+Text to replace macrolines with in the output.
+You may for example want to use
+.B %
+for TeX files.
+Default value is the empty string.
 .TP
 .BI \-s\  symbol
 Set the prefix symbol for preprocessor directives.
@@ -336,7 +353,7 @@ preprocessors.
 .SH NOTES
 None.
 
-.SH BUS
+.SH BUGS
 None.
 
 .SH FUTURE DIRECTIONS
