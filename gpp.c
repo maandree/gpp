@@ -340,7 +340,7 @@ after_unshebang:
 							append(&out_data, &out_len, &out_size, "%c\"'", c);
 							continue;
 						}
-					} else if (c == '(' || c == '}') {
+					} else if (c == '(' || c == '{') {
 						brackets += 1;
 					} else if (c == '\\') {
 						esc = 1;
