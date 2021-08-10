@@ -17,11 +17,11 @@ install: gpp
 	mkdir -p -- "$(DESTDIR)$(PREFIX)/bin"
 	mkdir -p -- "$(DESTDIR)$(MANPREFIX)/man"
 	cp -- gpp "$(DESTDIR)$(PREFIX)/bin/gpp"
-	cp -- gpp.1 "$(DESTDIR)$(MANPREFIX)/man/gpp.1"
+	cp -- gpp.1 "$(DESTDIR)$(MANPREFIX)/man1/gpp.1"
 
 uninstall:
 	-rm -- "$(DESTDIR)$(PREFIX)/bin/gpp"
-	-rm -- "$(DESTDIR)$(MANPREFIX)/man/gpp.1"
+	-rm -- "$(DESTDIR)$(MANPREFIX)/man1/gpp.1"
 
 clean:
 	-rm -rf -- gpp *.o *.su
