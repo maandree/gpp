@@ -15,7 +15,7 @@ gpp: gpp.o
 
 install: gpp
 	mkdir -p -- "$(DESTDIR)$(PREFIX)/bin"
-	mkdir -p -- "$(DESTDIR)$(MANPREFIX)/man"
+	mkdir -p -- "$(DESTDIR)$(MANPREFIX)/man1"
 	cp -- gpp "$(DESTDIR)$(PREFIX)/bin/gpp"
 	cp -- gpp.1 "$(DESTDIR)$(MANPREFIX)/man1/gpp.1"
 
