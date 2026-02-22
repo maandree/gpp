@@ -13,7 +13,7 @@ ETYMOLOGY
 DESCRIPTION
 	gpp lets a developer embed directives written in GNU
 	Bash (this can be changed) into any text document.
-	These directives are used to automate the writting of
+	These directives are used to automate the writing of
 	parts of the document.
 
 	The preprocessing directives start with a symbol
@@ -34,15 +34,14 @@ DESCRIPTION
 	Preprocessing directives can also be inline. For this,
 	use @(COMMAND) where COMMAND is the Bash code to run.
 	Additionally, gpp supports variable substitution.
-	@{VARIABLE} will be replaces by the value if the
-	variable (possibility environment variable) VARIABLE.
-	gpp supports all modifiers thats Bash (or which ever
+	@{VARIABLE} will be replaced by the value of the
+	variable (possibly an environment variable) VARIABLE.
+	gpp supports all modifiers that Bash (or whichever
 	shell is selected) supports. For example, if you want
 	the value to be included but uppercase you can write
 	@{VARIABLE^^}, or @{VARIABLE,,} for lowercase. gpp
-	also supports mathematical expressions that the via
-	the shells $((EXPRESSION)) syntax, by using
-	@((EXPRESSION)).
+	also supports mathematical expressions via the shell's
+	$((EXPRESSION)) syntax, by using @((EXPRESSION)).
 
 	Everything that is not a preprocessing directive is
 	echo verbatim, except all @@ are replaced by @.
@@ -97,13 +96,13 @@ EXAMPLES
 	the environment variable HELLO is defined and is not
 	empty.
 
-	@>if [ -z "$HELLO" ]; the
+	@>if [ -z "$HELLO" ]; then
 	Hello world
 	@>fi
 
-    Mutliline preprocessor directive
+    Multiline preprocessor directive
 	This example creates the function uppercase() that
-	convert lower case ASCII leters to uper case.
+	converts lower case ASCII letters to upper case.
 
 	@<uppercase () {
 	     lower=qwertyuiopasdfghjklzxcvbnm
@@ -137,13 +136,13 @@ RATIONALE
 	Programmers need more automation when we write software
 	and documentation. An unrestricted preprocessor lets
 	you automate just about anything. Of course, it can be
-	used for anything, must just writing software and
+	used for anything, not just writing software and
 	documentation. Preprocessing can be used for more than
 	automation, it can also be used to increase the flexibility
 	of the work.
 
 	C is one of the few languages that includes a preprocessor,
-	some times it is not enough; and all languages need
+	sometimes it is not enough; and all languages need
 	preprocessors.
 
 SEE ALSO

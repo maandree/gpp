@@ -1,4 +1,4 @@
-.TH GPP 1 gpp
+.TH GPP 1 GPP
 .SH NAME
 gpp - Bash-based preprocessor for anything
 
@@ -29,7 +29,7 @@ gpp stands for General Preprocessor.
 .B gpp
 lets a developer embed directives written in GNU Bash
 (this can be changed) into any text document. These
-directives are used to automate the writting of parts
+directives are used to automate the writing of parts
 of the document.
 .PP
 The preprocessing directives start with a symbol (or
@@ -38,7 +38,7 @@ this symbol is
 .B @
 (at).
 .PP
-Any line starting with 
+Any line starting with
 .B @<
 (where
 .B @
@@ -73,13 +73,13 @@ code to run. Additionally,
 .B gpp
 supports variable substitution.
 .BI @{ VARIABLE }
-will be replaces by the value if the variable
-(possibility environment variable)
+will be replaced by the value of the variable
+(possibly an environment variable)
 .IR VARIABLE .
 .B gpp
 supports all modifiers that
 .BR bash (1)
-(or which ever
+(or whichever
 .I shell
 is selected) supports. For example, if you want the
 value to be included but uppercase you can write
@@ -88,8 +88,7 @@ or
 .BI @{ VARIABLE ,,}
 for lowercase.
 .B gpp
-also supports mathematical expressions that the via
-the shells
+also supports mathematical expressions via the shell's
 .BI $(( EXPRESSION ))
 syntax, by using
 .BR @(( \fIEXPRESSION\fP )) .
@@ -232,15 +231,15 @@ line if the environment variable
 is defined and is not empty.
 .PP
 .nf
-@>if [ -z "$HELLO" ]; the
+@>if [ -z "$HELLO" ]; then
 Hello world
 @>fi
 .fi
 
-.SS Mutliline preprocessor directive
+.SS Multiline preprocessor directive
 This example creates the function
 .BR uppercase ()
-that convert lower case ASCII leters to uper case.
+that converts lower case ASCII letters to upper case.
 .PP
 .nf
 @<uppercase () {
@@ -341,13 +340,13 @@ include_verbatim () {
 Programmers need more automation when we write software
 and documentation. An unrestricted preprocessor lets
 you automate just about anything. Of course, it can be
-used for anything, must just writing software and
+used for anything, not just writing software and
 documentation. Preprocessing can be used for more than
 automation, it can also be used to increase the flexibility
 of the work.
 .PP
 C is one of the few languages that includes a preprocessor,
-some times it is not enough; and all languages need
+sometimes it is not enough; and all languages need
 preprocessors.
 
 .SH NOTES
